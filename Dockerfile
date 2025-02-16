@@ -7,6 +7,8 @@ COPY . /job-platform
 
 WORKDIR /job-platform
 
+RUN chmod 777 ./mvnw
+
 RUN ./mvnw dependency:go-offline
 
 ENV WAIT_VERSION 2.7.2
