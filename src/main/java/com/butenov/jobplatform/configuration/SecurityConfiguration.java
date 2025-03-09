@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration
 {
@@ -25,7 +27,7 @@ public class SecurityConfiguration
 	{
 		http
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/", "/login", "/register", "/css/**", "/js/**").permitAll()
+						.requestMatchers("/", "/login", "/register/**", "/css/**", "/js/**").permitAll()
 						.anyRequest().authenticated()
 				)
 				.formLogin(login -> login

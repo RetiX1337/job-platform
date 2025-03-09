@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Job List</title>
+</head>
+<body>
+<h1>Job List</h1>
+<a sec:authorize="@securityUtil.isRecruiter()" href="/jobs/create">Create New Job</a>
+<table border="1">
+    <tr>
+        <th>Title</th>
+        <th>Company</th>
+        <th>Actions</th>
+    </tr>
+    <tr th:each="job : ${jobs}">
+        <td th:text="${job.title}"></td>
+        <td th:text="${job.company.name}"></td>
+        <td>
+            <a th:href="@{/jobs/edit/__${job.id}__}">Edit</a>
+            <a th:href="@{/jobs/__${job.id}__}">Show</a>
+            <form sec:authorize="hasAuthority('ROLE_RECRUITER')" th:action="@{/jobs/delete/{id}(id=${job.id})}"
+                  method="post" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

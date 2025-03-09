@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${jobForm.id == null ? 'Create Job' : 'Edit Job'}">Job Form</title>
+</head>
+<body>
+
+<h2 th:text="${jobForm.id == null ? 'Create Job' : 'Edit Job'}"></h2>
+
+<!-- Error message display -->
+<div th:if="${error}" style="color: red;">
+    <p th:text="${error}"></p>
+</div>
+
+<!-- Job Form -->
+<form th:action="${jobForm.id == null} ? '/jobs/create' : '/jobs/edit/' + ${jobForm.id}"
+      th:object="${jobForm}" method="post">
+
+    <input type="hidden" th:field="*{id}"/>
+
+    <label for="title">Title:</label>
+    <input id="title" type="text" th:field="*{title}" required/>
+    <br/>
+
+    <label for="description">Description:</label>
+    <textarea id="description" th:field="*{description}" required></textarea>
+    <br/>
+
+    <label for="location">Location:</label>
+    <input id="location" type="text" th:field="*{location}" required/>
+    <br/>
+
+    <label for="requirements">Requirements:</label>
+    <textarea id="requirements" th:field="*{requirements}" required></textarea>
+    <br/>
+
+    <label for="skills">Required Skills:</label>
+    <select id="skills" th:field="*{requiredSkillIds}" multiple>
+        <option th:each="skill : ${skills}"
+                th:value="${skill.id}"
+                th:text="${skill.name}"></option>
+    </select>
+    <br/>
+
+    <button type="submit">Submit</button>
+</form>
+
+<!-- Back to Job List -->
+<a href="/jobs">Back to Job List</a>
+
+</body>
+</html>
+

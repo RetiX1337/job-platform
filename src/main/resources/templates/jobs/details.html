@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Job Details</title>
+</head>
+<body>
+
+<h2 th:text="${job.title}"></h2>
+<p><strong>Company:</strong> <span th:text="${job.getCompanyId()}"></span></p>
+<p><strong>Location:</strong> <span th:text="${job.location}"></span></p>
+<p><strong>Description:</strong> <span th:text="${job.description}"></span></p>
+<p><strong>Requirements:</strong> <span th:text="${job.requirements}"></span></p>
+
+<h3>Required Skills</h3>
+<ul>
+    <li th:each="skill : ${job.requiredSkillIds}" th:text="${skill}"></li>
+</ul>
+
+<form sec:authorize="@securityUtil.isCandidate()" th:action="@{/applications/apply}" method="post">
+    <input type="hidden" name="jobId" th:value="${job.id}"/>
+    <button type="submit">Apply for this Job</button>
+</form>
+
+<a href="/jobs">Back to Job Listings</a>
+
+</body>
+</html>
