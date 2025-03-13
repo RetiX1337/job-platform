@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Job Search</title>
+</head>
+<body>
+
+<!-- Job Search Form -->
+<form th:action="@{/jobs/search}" method="get">
+    <input type="text" name="title" th:value="${criteria.title}" placeholder="Job Title" />
+    <input type="text" name="location" th:value="${criteria.location}" placeholder="Location" />
+    <input type="number" name="minSalary" th:value="${criteria.minSalary}" placeholder="Min Salary" />
+    <input type="number" name="maxSalary" th:value="${criteria.maxSalary}" placeholder="Max Salary" />
+
+    <!-- Skills input (multi-select) -->
+    <select name="requiredSkillIds" multiple>
+        <option th:each="skill : ${allSkills}"
+                th:value="${skill.id}"
+                th:selected="${criteria.requiredSkillIds.contains(skill.id)}">
+            <span th:text="${skill.name}"></span>
+        </option>
+    </select>
+
+    <!-- Companies input (multi-select) -->
+    <select name="companyIds" multiple>
+        <option th:each="company : ${allCompanies}"
+                th:value="${company.id}"
+                th:selected="${criteria.companyIds.contains(company.id)}">
+            <span th:text="${company.name}"></span>
+        </option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+<!-- Job List -->
+<div th:if="${#lists.isEmpty(jobPage.content)}">
+    <p>No jobs found.</p>
+</div>
+
+<div th:if="${not #lists.isEmpty(jobPage.content)}">
+    <ul>
+        <li th:each="job : ${jobPage.content}">
+            <a th:href="@{/jobs/{id}(id=${job.id})}">
+                <span th:text="${job.title}"></span> -
+                <span th:text="${job.location}"></span> -
+                <span th:text="${job.salary}"></span>
+            </a>
+        </li>
+    </ul>
+
+
+    <!-- Pagination -->
+    <div>
+        <span>Page: </span>
+        <a th:href="@{/jobs(page=${currentPage - 1}, size=${size})}" th:if="${currentPage > 0}">Previous</a> |
+        <span th:text="${currentPage + 1}"></span> |
+        <a th:href="@{/jobs(page=${currentPage + 1}, size=${size})}" th:if="${currentPage < totalPages - 1}">Next</a>
+    </div>
+
+    <div>
+        <span th:text="'Total pages: ' + ${totalPages}"></span>
+        <span th:text="'Total jobs: ' + ${totalItems}"></span>
+    </div>
+</div>
+
+</body>
+</html>
+

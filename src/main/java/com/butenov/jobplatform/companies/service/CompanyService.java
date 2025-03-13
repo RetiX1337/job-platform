@@ -1,6 +1,6 @@
 package com.butenov.jobplatform.companies.service;
 
-import java.util.Set;
+import java.util.List;
 
 import com.butenov.jobplatform.companies.model.Company;
 
@@ -8,5 +8,5 @@ public interface CompanyService
 {
 	Company findById(final Long id);
 
-	Set<Company> findAll();
+	List<Company> findAll();
 }

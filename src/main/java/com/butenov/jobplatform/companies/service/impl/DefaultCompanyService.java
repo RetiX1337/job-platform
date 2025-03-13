@@ -1,8 +1,6 @@
 package com.butenov.jobplatform.companies.service.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -28,8 +26,8 @@ public class DefaultCompanyService implements CompanyService
 	}
 
 	@Override
-	public Set<Company> findAll()
+	public List<Company> findAll()
 	{
-		return new HashSet<>(companyRepository.findAll());
+		return companyRepository.findAll();
 	}
 }
