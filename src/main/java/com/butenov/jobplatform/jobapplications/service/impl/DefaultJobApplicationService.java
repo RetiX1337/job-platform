@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.butenov.jobplatform.jobapplications.model.JobApplication;
 import com.butenov.jobplatform.jobapplications.repository.JobApplicationRepository;
 import com.butenov.jobplatform.jobapplications.service.JobApplicationService;
+import com.butenov.jobplatform.jobs.model.Job;
+import com.butenov.jobplatform.users.model.Candidate;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -27,6 +29,22 @@ public class DefaultJobApplicationService implements JobApplicationService
 	}
 
 	@Override
+	public void applyForJob(final Job job, final Candidate candidate)
+	{
+		if (candidateHasAppliedForJob(job, candidate))
+		{
+			throw new IllegalArgumentException("Candidate has already applied for this job");
+		}
+
+		final JobApplication application = new JobApplication();
+		application.setCandidate(candidate);
+		application.setJob(job);
+		application.setStatus(JobApplication.Status.PENDING);
+
+		save(application);
+	}
+
+	@Override
 	public JobApplication findById(final Long id)
 	{
 		return jobApplicationRepository.findById(id)
@@ -44,5 +62,11 @@ public class DefaultJobApplicationService implements JobApplicationService
 	public void deleteById(final Long id)
 	{
 		jobApplicationRepository.delete(findById(id));
+	}
+
+	@Override
+	public boolean candidateHasAppliedForJob(final Job job, final Candidate candidate)
+	{
+		return jobApplicationRepository.existsByJobAndCandidate(job, candidate);
 	}
 }

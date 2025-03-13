@@ -4,6 +4,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.butenov.jobplatform.users.model.Candidate;
 import com.butenov.jobplatform.users.model.Recruiter;
 import com.butenov.jobplatform.users.model.User;
 import com.butenov.jobplatform.users.service.UserService;
@@ -39,7 +40,7 @@ public class SecurityUtil
 		if (principal instanceof final UserDetails userDetails)
 		{
 			final User user = userService.findByEmail(userDetails.getUsername());
-			return user instanceof Recruiter;
+			return user instanceof Candidate;
 		}
 
 		return false;

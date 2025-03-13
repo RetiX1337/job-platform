@@ -17,7 +17,7 @@
     <li th:each="skill : ${job.requiredSkillIds}" th:text="${skill}"></li>
 </ul>
 
-<form sec:authorize="@securityUtil.isCandidate()" th:action="@{/applications/apply}" method="post">
+<form sec:authorize="@securityUtil.isCandidate()" th:action="@{/applications/apply/__${id}__}" method="post">
     <input type="hidden" name="jobId" th:value="${job.id}"/>
     <button type="submit">Apply for this Job</button>
 </form>

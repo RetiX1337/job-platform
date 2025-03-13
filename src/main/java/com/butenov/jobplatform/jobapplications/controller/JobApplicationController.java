@@ -5,13 +5,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.butenov.jobplatform.jobapplications.model.JobApplication;
 import com.butenov.jobplatform.jobapplications.service.JobApplicationService;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.service.JobService;
@@ -28,7 +25,7 @@ public class JobApplicationController
 	private final JobService jobService;
 	private final UserService userService;
 
-	public JobApplicationController(JobApplicationService jobApplicationService, JobService jobService, UserService userService)
+	public JobApplicationController(final JobApplicationService jobApplicationService, final JobService jobService, final UserService userService)
 	{
 		this.jobApplicationService = jobApplicationService;
 		this.jobService = jobService;
@@ -48,11 +45,7 @@ public class JobApplicationController
 
 		final Job job = jobService.findById(jobId);
 
-		final JobApplication application = new JobApplication();
-		application.setCandidate(candidate);
-		application.setJob(job);
-
-		jobApplicationService.save(application);
+		jobApplicationService.applyForJob(job, candidate);
 
 		return "redirect:/jobs/{jobId}";
 	}
