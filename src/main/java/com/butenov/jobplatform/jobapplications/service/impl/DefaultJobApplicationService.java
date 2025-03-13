@@ -59,6 +59,32 @@ public class DefaultJobApplicationService implements JobApplicationService
 	}
 
 	@Override
+	public List<JobApplication> findByJobId(final Long jobId)
+	{
+		return jobApplicationRepository.findByJobId(jobId);
+	}
+
+	@Override
+	public void acceptApplication(final JobApplication jobApplication)
+	{
+		jobApplication.setStatus(JobApplication.Status.ACCEPTED);
+		save(jobApplication);
+	}
+
+	@Override
+	public void rejectApplication(final JobApplication jobApplication)
+	{
+		jobApplication.setStatus(JobApplication.Status.REJECTED);
+		save(jobApplication);
+	}
+
+	@Override
+	public List<JobApplication> findByCandidateId(final Long candidateId)
+	{
+		return jobApplicationRepository.findByCandidateId(candidateId);
+	}
+
+	@Override
 	public void deleteById(final Long id)
 	{
 		jobApplicationRepository.delete(findById(id));

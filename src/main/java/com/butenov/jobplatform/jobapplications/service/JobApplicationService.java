@@ -16,6 +16,14 @@ public interface JobApplicationService
 
 	List<JobApplication> findAll();
 
+	List<JobApplication> findByJobId(final Long jobId);
+
+	void acceptApplication(final JobApplication jobApplication);
+
+	void rejectApplication(final JobApplication jobApplication);
+
+	List<JobApplication> findByCandidateId(final Long candidateId);
+
 	void deleteById(final Long id);
 
 	boolean candidateHasAppliedForJob(final Job job, final Candidate candidate);

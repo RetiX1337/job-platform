@@ -1,8 +1,5 @@
 package com.butenov.jobplatform.jobs.controller;
 
-import java.util.List;
-
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.butenov.jobplatform.commons.SecurityUtil;
 import com.butenov.jobplatform.jobs.converter.JobConverter;
 import com.butenov.jobplatform.jobs.dto.JobForm;
 import com.butenov.jobplatform.jobs.model.Job;
@@ -33,14 +31,16 @@ public class JobController
 	private final JobConverter jobConverter;
 	private final SkillService skillService;
 	private final UserService userService;
+	private final SecurityUtil securityUtil;
 
 	public JobController(final JobService jobService, final JobConverter jobConverter,
-	                     final SkillService skillService, final UserService userService)
+	                     final SkillService skillService, final UserService userService, final SecurityUtil securityUtil)
 	{
 		this.jobService = jobService;
 		this.jobConverter = jobConverter;
 		this.skillService = skillService;
 		this.userService = userService;
+		this.securityUtil = securityUtil;
 	}
 
 	@GetMapping("/{id}")
@@ -85,10 +85,7 @@ public class JobController
 	                           @AuthenticationPrincipal final UserDetails userDetails)
 	{
 		final Job job = jobService.findById(id);
-		if (!isAuthorized(userDetails, job))
-		{
-			throw new AccessDeniedException("You cannot edit this job.");
-		}
+		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, job);
 
 		return prepareJobForm(jobConverter.convertToDto(job), model);
 	}
@@ -99,10 +96,7 @@ public class JobController
 	                        @AuthenticationPrincipal final UserDetails userDetails)
 	{
 		final Job existingJob = jobService.findById(id);
-		if (!isAuthorized(userDetails, existingJob))
-		{
-			throw new AccessDeniedException("You cannot edit this job.");
-		}
+		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, existingJob);
 
 		jobForm.setCompanyId(existingJob.getCompany().getId());
 		return saveJob(jobForm, model);
@@ -113,10 +107,7 @@ public class JobController
 	public String deleteJob(@PathVariable final Long id, @AuthenticationPrincipal final UserDetails userDetails)
 	{
 		final Job job = jobService.findById(id);
-		if (!isAuthorized(userDetails, job))
-		{
-			throw new AccessDeniedException("You cannot delete this job.");
-		}
+		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, job);
 
 		jobService.deleteById(id);
 		return "redirect:/jobs";
@@ -146,12 +137,6 @@ public class JobController
 		}
 
 		return recruiter;
-	}
-
-	private boolean isAuthorized(final UserDetails userDetails, final Job job)
-	{
-		final User user = userService.findByEmail(userDetails.getUsername());
-		return user instanceof final Recruiter recruiter && job.getCompany().equals(recruiter.getCompany());
 	}
 
 	private String saveJob(final JobForm jobForm, final Model model)
