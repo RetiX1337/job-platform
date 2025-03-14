@@ -6,9 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.butenov.jobplatform.security.dto.CandidateRegistrationInfo;
-import com.butenov.jobplatform.users.model.Candidate;
+import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.users.model.Role;
-import com.butenov.jobplatform.users.model.User;
 import com.butenov.jobplatform.users.service.UserService;
 
 import jakarta.transaction.Transactional;

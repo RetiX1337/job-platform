@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Candidate Profile</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<h1>Candidate Profile</h1>
+
+<div class="profile-container">
+    <h2 th:text="${candidate.firstName} + ' ' + ${candidate.lastName}"></h2>
+    <p><strong>Email:</strong> <span th:text="${candidate.email}"></span></p>
+
+    <h3>Skills</h3>
+    <ul>
+        <li th:each="skill : ${candidate.skills}" th:text="${skill.name}"></li>
+    </ul>
+
+    <h3>Job Experience</h3>
+    <table>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Location</th>
+            <th>Duration</th>
+        </tr>
+        <tr th:each="experience : ${candidate.jobExperiences}">
+            <td th:text="${experience.jobTitle}"></td>
+            <td th:text="${experience.companyName}"></td>
+            <td th:text="${experience.location}"></td>
+            <td th:text="${experience.startDate} + ' - ' + (${experience.endDate} ?: 'Present')"></td>
+        </tr>
+    </table>
+
+    <h3>Education</h3>
+    <table>
+        <tr>
+            <th>Degree</th>
+            <th>School</th>
+            <th>Field of Study</th>
+            <th>Duration</th>
+        </tr>
+        <tr th:each="education : ${candidate.educations}">
+            <td th:text="${education.degree}"></td>
+            <td th:text="${education.schoolName}"></td>
+            <td th:text="${education.fieldOfStudy}"></td>
+            <td th:text="${education.startDate} + ' - ' + (${education.endDate} ?: 'Present')"></td>
+        </tr>
+    </table>
+
+    <h3>CV</h3>
+    <p th:if="${candidate.cvLink}">
+        <a th:href="${candidate.cvLink}" target="_blank">View CV</a>
+    </p>
+    <p th:unless="${candidate.cvLink}">No CV uploaded.</p>
+
+</div>
+</body>
+</html>

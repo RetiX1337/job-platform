@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.butenov.jobplatform.jobapplications.model.JobApplication;
 import com.butenov.jobplatform.jobs.model.Job;
-import com.butenov.jobplatform.users.model.Candidate;
+import com.butenov.jobplatform.candidates.model.Candidate;
 
 public interface JobApplicationService
 {

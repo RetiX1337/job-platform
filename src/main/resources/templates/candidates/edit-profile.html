@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <script>
+        function addJobExperience() {
+            let container = document.getElementById("jobExperienceContainer");
+            let newIndex = container.children.length;
+            let newEntry = document.createElement("div");
+
+            newEntry.innerHTML = `
+                <label>Job Title:</label>
+                <input type="text" name="jobExperienceList[${newIndex}].jobTitle" required />
+
+                <label>Company Name:</label>
+                <input type="text" name="jobExperienceList[${newIndex}].companyName" required />
+
+                <label>Start Date:</label>
+                <input type="date" name="jobExperienceList[${newIndex}].startDate" required />
+
+                <label>End Date:</label>
+                <input type="date" name="jobExperienceList[${newIndex}].endDate" />
+
+                <label>Location:</label>
+                <input type="text" name="jobExperienceList[${newIndex}].location" />
+
+                <label>Description:</label>
+                <input type="text" name="jobExperienceList[${newIndex}].description" />
+
+                <button type="button" onclick="removeElement(this)">Remove</button>
+            `;
+            container.appendChild(newEntry);
+        }
+
+        function addEducation() {
+            let container = document.getElementById("educationContainer");
+            let newIndex = container.children.length;
+            let newEntry = document.createElement("div");
+
+            newEntry.innerHTML = `
+                <label>Degree:</label>
+                <input type="text" name="educationList[${newIndex}].degree" required />
+
+                <label>School Name:</label>
+                <input type="text" name="educationList[${newIndex}].schoolName" required />
+
+                <label>Field of Study:</label>
+                <input type="text" name="educationList[${newIndex}].fieldOfStudy" />
+
+                <label>Start Date:</label>
+                <input type="date" name="educationList[${newIndex}].startDate" required />
+
+                <label>End Date:</label>
+                <input type="date" name="educationList[${newIndex}].endDate" />
+
+                <label>Description:</label>
+                <input type="text" name="educationList[${newIndex}].description" />
+
+                <button type="button" onclick="removeElement(this)">Remove</button>
+            `;
+            container.appendChild(newEntry);
+        }
+
+        function removeElement(button) {
+            button.parentElement.remove();
+        }
+    </script>
+</head>
+<body>
+<h1>Edit Profile</h1>
+
+<form th:action="@{/candidates/edit}" th:object="${candidateProfileEditingDto}" method="post">
+    <label>First Name:</label>
+    <input type="text" th:field="*{firstName}" required />
+
+    <label>Last Name:</label>
+    <input type="text" th:field="*{lastName}" required />
+
+    <label>CV Link:</label>
+    <input type="text" th:field="*{cvLink}" />
+
+    <label for="skills">Skills</label>
+    <select name="skillIds" id="skills" th:field="*{skillIds}" multiple>
+        <option th:each="skill : ${skills}"
+                th:value="${skill.id}"
+                th:text="${skill.name}"></option>
+    </select>
+
+    <h2>Job Experience</h2>
+    <div id="jobExperienceContainer">
+        <div th:each="jobExperience, iterStat : ${candidateProfileEditingDto.getJobExperienceList()}">
+            <label>Job Title:</label>
+            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].jobTitle'" th:value="${jobExperience.jobTitle}" required />
+
+            <label>Company Name:</label>
+            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].companyName'" th:value="${jobExperience.companyName}" required />
+
+            <label>Start Date:</label>
+            <input type="date" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].startDate'" th:value="${jobExperience.startDate}" required />
+
+            <label>End Date:</label>
+            <input type="date" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].endDate'" th:value="${jobExperience.endDate}" />
+
+            <label>Location:</label>
+            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].location'" th:value="${jobExperience.location}" />
+
+            <label>Description:</label>
+            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].description'" th:value="${jobExperience.description}" />
+
+            <button type="button" onclick="removeElement(this)">Remove</button>
+        </div>
+    </div>
+    <button type="button" onclick="addJobExperience()">Add Job Experience</button>
+
+    <h2>Education</h2>
+    <div id="educationContainer">
+        <div th:each="education, iterStat : ${candidateProfileEditingDto.getEducationList()}">
+            <label>Degree:</label>
+            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].degree'" th:value="${education.degree}" required />
+
+            <label>School Name:</label>
+            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].schoolName'" th:value="${education.schoolName}" required />
+
+            <label>Field of Study:</label>
+            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].fieldOfStudy'" th:value="${education.fieldOfStudy}" />
+
+            <label>Start Date:</label>
+            <input type="date" th:attr="name='educationList[' + ${iterStat.index} + '].startDate'" th:value="${education.startDate}" required />
+
+            <label>End Date:</label>
+            <input type="date" th:attr="name='educationList[' + ${iterStat.index} + '].endDate'" th:value="${education.endDate}" />
+
+            <label>Description:</label>
+            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].description'" th:value="${education.description}" />
+
+            <button type="button" onclick="removeElement(this)">Remove</button>
+        </div>
+    </div>
+    <button type="button" onclick="addEducation()">Add Education</button>
+
+    <button type="submit">Save</button>
+</form>
+
+<a href="/candidates/profile">Back to Profile</a>
+</body>
+</html>

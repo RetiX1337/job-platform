@@ -8,7 +8,7 @@ import com.butenov.jobplatform.jobapplications.model.JobApplication;
 import com.butenov.jobplatform.jobapplications.repository.JobApplicationRepository;
 import com.butenov.jobplatform.jobapplications.service.JobApplicationService;
 import com.butenov.jobplatform.jobs.model.Job;
-import com.butenov.jobplatform.users.model.Candidate;
+import com.butenov.jobplatform.candidates.model.Candidate;
 
 import jakarta.persistence.EntityNotFoundException;
 

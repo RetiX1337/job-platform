@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.butenov.jobplatform.jobs.model.Job;
-import com.butenov.jobplatform.users.model.Candidate;
+import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.users.model.Recruiter;
 import com.butenov.jobplatform.users.model.User;
 import com.butenov.jobplatform.users.service.UserService;
