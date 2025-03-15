@@ -26,8 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.butenov.jobplatform.candidates.dto.CandidateProfileEditingDto;
+import com.butenov.jobplatform.candidates.dto.LlmCvProcessingDto;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.candidates.service.CandidateService;
+import com.butenov.jobplatform.candidates.service.LlmCvProcessingService;
 import com.butenov.jobplatform.skills.model.Skill;
 import com.butenov.jobplatform.skills.service.SkillService;
 import com.butenov.jobplatform.users.service.UserService;
@@ -42,6 +44,7 @@ public class CandidateController
 	private final CandidateService candidateService;
 	private final UserService userService;
 	private final SkillService skillService;
+	private final LlmCvProcessingService llmCvProcessingService;
 
 	@GetMapping("/{id}")
 	public String viewProfile(final Model model, final @PathVariable Long id)
@@ -55,31 +58,7 @@ public class CandidateController
 	@GetMapping("/edit")
 	public String editProfile(final Model model, @AuthenticationPrincipal final UserDetails userDetails)
 	{
-		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
-
-		if (candidate.getEducations() == null)
-		{
-			candidate.setEducations(new ArrayList<>());
-		}
-		if (candidate.getJobExperiences() == null)
-		{
-			candidate.setJobExperiences(new ArrayList<>());
-		}
-
-		final CandidateProfileEditingDto candidateProfileEditingDto =
-				CandidateProfileEditingDto.builder()
-				                          .cvLink(candidate.getCvLink())
-				                          .firstName(candidate.getFirstName())
-				                          .lastName(candidate.getLastName())
-				                          .jobExperienceList(new ArrayList<>(candidate.getJobExperiences()))
-				                          .educationList(new ArrayList<>(candidate.getEducations()))
-				                          .skillIds(candidate.getSkills().stream().map(Skill::getId).toList())
-				                          .build();
-
-		model.addAttribute("candidateProfileEditingDto", candidateProfileEditingDto);
-		model.addAttribute("skills", skillService.findAll());
-
-		return "candidates/edit-profile";
+		return prepareCandidateEditForm(model, userDetails);
 	}
 
 	@PreAuthorize("@securityUtil.isCandidate()")
@@ -156,7 +135,6 @@ public class CandidateController
 			return ResponseEntity.notFound().build();
 		}
 
-		// Load the file as a resource
 		final Resource resource = new UrlResource(filePath.toUri());
 		final String filename = filePath.getFileName().toString();
 
@@ -164,5 +142,66 @@ public class CandidateController
 		                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
 		                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
 		                     .body(resource);
+	}
+
+	@GetMapping("/test")
+	public String test(@AuthenticationPrincipal final UserDetails userDetails)
+	{
+		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+		final LlmCvProcessingDto llmCvProcessingDto = llmCvProcessingService.processCv(candidate.getCvLink());
+
+		return "candidates/test";
+	}
+
+	@PostMapping("/update-from-cv")
+	public String updateCandidateFromCV(@AuthenticationPrincipal final UserDetails userDetails, final Model model)
+	{
+		try
+		{
+			final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+			if (candidate.getCvLink() == null || candidate.getCvLink().isEmpty())
+			{
+				model.addAttribute("error", "No CV found for this candidate.");
+				return prepareCandidateEditForm(model, userDetails);
+			}
+
+			candidateService.updateCandidateFromCV(candidate);
+
+			return "redirect:/candidates/" + candidate.getId();
+		}
+		catch (final Exception e)
+		{
+			model.addAttribute("error", "An error occurred while updating your profile.");
+			return prepareCandidateEditForm(model, userDetails);
+		}
+	}
+
+	private String prepareCandidateEditForm(final Model model, final UserDetails userDetails)
+	{
+		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+
+		if (candidate.getEducations() == null)
+		{
+			candidate.setEducations(new ArrayList<>());
+		}
+		if (candidate.getJobExperiences() == null)
+		{
+			candidate.setJobExperiences(new ArrayList<>());
+		}
+
+		final CandidateProfileEditingDto candidateProfileEditingDto =
+				CandidateProfileEditingDto.builder()
+				                          .cvLink(candidate.getCvLink())
+				                          .firstName(candidate.getFirstName())
+				                          .lastName(candidate.getLastName())
+				                          .jobExperienceList(new ArrayList<>(candidate.getJobExperiences()))
+				                          .educationList(new ArrayList<>(candidate.getEducations()))
+				                          .skillIds(candidate.getSkills().stream().map(Skill::getId).toList())
+				                          .build();
+
+		model.addAttribute("candidateProfileEditingDto", candidateProfileEditingDto);
+		model.addAttribute("skills", skillService.findAll());
+
+		return "candidates/edit-profile";
 	}
 }

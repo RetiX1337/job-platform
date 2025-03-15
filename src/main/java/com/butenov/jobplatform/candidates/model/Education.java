@@ -2,6 +2,7 @@ package com.butenov.jobplatform.candidates.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,6 +30,8 @@ public class Education
 	private String fieldOfStudy;
 	private LocalDate startDate;
 	private LocalDate endDate;
+
+	@Column(columnDefinition = "TEXT")
 	private String description;
 
 	@ManyToOne

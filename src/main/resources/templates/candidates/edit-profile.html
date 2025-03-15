@@ -102,7 +102,7 @@
     <input type="text" th:field="*{lastName}" required />
 
     <label>Upload CV:</label>
-    <input type="file" id="cvFile" name="cvFile" accept=".pdf,.doc,.docx" />
+    <input type="file" id="cvFile" name="cvFile" accept=".pdf" />
     <button type="button" onclick="uploadCV()">Upload</button>
 
     <p id="uploadStatus"></p>
@@ -168,6 +168,14 @@
 
     <button type="submit">Save</button>
 </form>
+
+<form th:action="@{/candidates/update-from-cv}" method="post">
+    <button type="submit">Retrieve Data from CV</button>
+</form>
+
+<div th:if="${error != null}" class="error-message">
+    <p th:text="${error}"></p>
+</div>
 
 <a href="/candidates/profile">Back to Profile</a>
 </body>
