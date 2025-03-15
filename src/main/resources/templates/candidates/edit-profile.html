@@ -65,6 +65,30 @@
         function removeElement(button) {
             button.parentElement.remove();
         }
+
+        function uploadCV() {
+            let fileInput = document.getElementById("cvFile");
+            let file = fileInput.files[0];
+            if (!file) {
+                alert("Please select a file first.");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("cvFile", file);
+
+            fetch("/candidates/upload-cv", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.text())
+                .then(() => {
+                    document.getElementById("uploadStatus").innerText = "File uploaded successfully";
+                })
+                .catch(error => {
+                    document.getElementById("uploadStatus").innerText = "Upload failed: " + error;
+                });
+        }
     </script>
 </head>
 <body>
@@ -77,8 +101,11 @@
     <label>Last Name:</label>
     <input type="text" th:field="*{lastName}" required />
 
-    <label>CV Link:</label>
-    <input type="text" th:field="*{cvLink}" />
+    <label>Upload CV:</label>
+    <input type="file" id="cvFile" name="cvFile" accept=".pdf,.doc,.docx" />
+    <button type="button" onclick="uploadCV()">Upload</button>
+
+    <p id="uploadStatus"></p>
 
     <label for="skills">Skills</label>
     <select name="skillIds" id="skills" th:field="*{skillIds}" multiple>
