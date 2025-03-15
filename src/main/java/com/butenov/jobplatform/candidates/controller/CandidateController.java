@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.butenov.jobplatform.candidates.dto.CandidateProfileEditingDto;
-import com.butenov.jobplatform.candidates.dto.LlmCvProcessingDto;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.candidates.service.CandidateService;
 import com.butenov.jobplatform.candidates.service.LlmCvProcessingService;
@@ -35,7 +34,9 @@ import com.butenov.jobplatform.skills.service.SkillService;
 import com.butenov.jobplatform.users.service.UserService;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 
+@Log
 @AllArgsConstructor
 @Controller
 @RequestMapping("/candidates")
@@ -72,17 +73,17 @@ public class CandidateController
 		candidate.setFirstName(candidateProfileEditingDto.getFirstName());
 		candidate.setLastName(candidateProfileEditingDto.getLastName());
 
+		candidate.getJobExperiences().clear();
 		if (candidateProfileEditingDto.getJobExperienceList() != null)
 		{
-			candidate.getJobExperiences().clear();
 			candidateProfileEditingDto.getJobExperienceList()
 			                          .forEach(jobExperience -> jobExperience.setCandidate(candidate));
 			candidate.getJobExperiences().addAll(candidateProfileEditingDto.getJobExperienceList());
 		}
 
+		candidate.getEducations().clear();
 		if (candidateProfileEditingDto.getEducationList() != null)
 		{
-			candidate.getEducations().clear();
 			candidateProfileEditingDto.getEducationList()
 			                          .forEach(education -> education.setCandidate(candidate));
 			candidate.getEducations().addAll(candidateProfileEditingDto.getEducationList());
@@ -144,15 +145,6 @@ public class CandidateController
 		                     .body(resource);
 	}
 
-	@GetMapping("/test")
-	public String test(@AuthenticationPrincipal final UserDetails userDetails)
-	{
-		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
-		final LlmCvProcessingDto llmCvProcessingDto = llmCvProcessingService.processCv(candidate.getCvLink());
-
-		return "candidates/test";
-	}
-
 	@PostMapping("/update-from-cv")
 	public String updateCandidateFromCV(@AuthenticationPrincipal final UserDetails userDetails, final Model model)
 	{
@@ -171,6 +163,7 @@ public class CandidateController
 		}
 		catch (final Exception e)
 		{
+			log.warning("Error updating candidate from CV: " + e.getMessage());
 			model.addAttribute("error", "An error occurred while updating your profile.");
 			return prepareCandidateEditForm(model, userDetails);
 		}
@@ -191,6 +184,7 @@ public class CandidateController
 
 		final CandidateProfileEditingDto candidateProfileEditingDto =
 				CandidateProfileEditingDto.builder()
+				                          .id(candidate.getId())
 				                          .cvLink(candidate.getCvLink())
 				                          .firstName(candidate.getFirstName())
 				                          .lastName(candidate.getLastName())

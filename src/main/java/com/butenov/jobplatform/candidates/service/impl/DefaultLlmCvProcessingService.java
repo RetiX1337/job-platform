@@ -15,7 +15,9 @@ import com.butenov.jobplatform.candidates.service.LlmCvProcessingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 
+@Log
 @AllArgsConstructor
 @Service
 public class DefaultLlmCvProcessingService implements LlmCvProcessingService
@@ -43,6 +45,7 @@ public class DefaultLlmCvProcessingService implements LlmCvProcessingService
 		}
 		catch (final Exception e)
 		{
+			log.warning("Error processing resume: " + e.getMessage());
 			throw new RuntimeException("Error processing resume", e);
 		}
 	}

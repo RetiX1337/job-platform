@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CandidateProfileEditingDto
 {
+	private Long id;
 	private String cvLink;
 	private String firstName;
 	private String lastName;

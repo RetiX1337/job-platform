@@ -1,5 +1,6 @@
 package com.butenov.jobplatform.skills.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,5 +20,6 @@ public class Skill {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(unique = true)
 	private String name;
 }

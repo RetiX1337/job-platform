@@ -21,16 +21,27 @@ public class DefaultFileService implements FileService
 	@Override
 	public String storeFile(final MultipartFile file) throws IOException
 	{
+		file.getContentType();
 		final Path uploadPath = Paths.get(uploadDir);
 		if (!Files.exists(uploadPath))
 		{
 			Files.createDirectories(uploadPath);
 		}
 
-		final String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+		final String fileName = UUID.randomUUID() + getFileExtension(file);
 		final Path filePath = uploadPath.resolve(fileName);
 
 		file.transferTo(filePath.toFile());
 		return filePath.toString();
+	}
+
+	public static String getFileExtension(final MultipartFile file)
+	{
+		final String originalFilename = file.getOriginalFilename();
+		if (originalFilename != null && originalFilename.contains("."))
+		{
+			return originalFilename.substring(originalFilename.lastIndexOf("."));
+		}
+		return "";
 	}
 }

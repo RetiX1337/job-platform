@@ -177,6 +177,6 @@
     <p th:text="${error}"></p>
 </div>
 
-<a href="/candidates/profile">Back to Profile</a>
+<a th:href="@{/candidates/__${candidateProfileEditingDto.id}__}">Back to Profile</a>
 </body>
 </html>

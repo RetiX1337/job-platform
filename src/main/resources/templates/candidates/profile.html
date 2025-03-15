@@ -54,7 +54,7 @@
 
     <h3>CV</h3>
     <p th:if="${candidate.cvLink}">
-        <a th:href="${candidate.cvLink}" target="_blank">View CV</a>
+        <a th:href="@{/candidates/__${candidate.id}__/cv}" target="_blank">View CV</a>
     </p>
     <p th:unless="${candidate.cvLink}">No CV uploaded.</p>
 
