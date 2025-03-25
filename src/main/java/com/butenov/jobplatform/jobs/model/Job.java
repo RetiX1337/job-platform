@@ -3,6 +3,7 @@ package com.butenov.jobplatform.jobs.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.companies.model.Company;
 import com.butenov.jobplatform.users.model.Recruiter;
 import com.butenov.jobplatform.skills.model.Skill;
@@ -25,11 +26,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Job {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
+public class Job extends BaseEntity
+{
 	private String title;
 	private String description;
 	private String location;
@@ -51,6 +49,7 @@ public class Job {
 			inverseJoinColumns = @JoinColumn(name = "skill_id")
 	)
 	private Set<Skill> requiredSkills = new HashSet<>();
+
 
 
 }

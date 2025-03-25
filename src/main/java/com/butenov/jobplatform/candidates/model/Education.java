@@ -2,6 +2,9 @@ package com.butenov.jobplatform.candidates.model;
 
 import java.time.LocalDate;
 
+import com.butenov.jobplatform.commons.model.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,12 +22,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Education
+public class Education extends BaseEntity
 {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
 	private String degree;
 	private String schoolName;
 	private String fieldOfStudy;
@@ -34,6 +33,7 @@ public class Education
 	@Column(columnDefinition = "TEXT")
 	private String description;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "candidate_id")
 	private Candidate candidate;

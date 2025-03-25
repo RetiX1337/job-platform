@@ -39,7 +39,7 @@ public class DefaultLlmCvProcessingService implements LlmCvProcessingService
 			final String fullPrompt = promptTemplate + extractedText;
 
 			final String aiResponse = openAiChatModel.call(fullPrompt);
-			final String cleanJson = aiResponse.replace("```", "").trim();
+			final String cleanJson = aiResponse.replace("```", "").replace("json", "").trim();
 
 			return objectMapper.readValue(cleanJson, LlmCvProcessingDto.class);
 		}

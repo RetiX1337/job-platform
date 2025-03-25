@@ -9,19 +9,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Set;
 
+import com.butenov.jobplatform.commons.model.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
-public class User implements UserDetails
+public class User extends BaseEntity implements UserDetails
 {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
 	private String email;
 	private String password;
 	private String firstName;
@@ -36,6 +36,12 @@ public class User implements UserDetails
 	public Collection<? extends GrantedAuthority> getAuthorities()
 	{
 		return roles;
+	}
+
+	@Override
+	public String getPassword()
+	{
+		return password;
 	}
 
 	@Override

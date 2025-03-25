@@ -3,6 +3,7 @@ package com.butenov.jobplatform.companies.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.users.model.Recruiter;
 
@@ -21,11 +22,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Company {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
+public class Company extends BaseEntity
+{
 	private String name;
 	private String description;
 

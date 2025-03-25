@@ -1,5 +1,7 @@
 package com.butenov.jobplatform.skills.model;
 
+import com.butenov.jobplatform.commons.model.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,11 +17,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Skill {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
+public class Skill extends BaseEntity
+{
 	@Column(unique = true)
 	private String name;
 }

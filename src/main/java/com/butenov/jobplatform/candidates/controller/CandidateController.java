@@ -45,12 +45,20 @@ public class CandidateController
 	private final CandidateService candidateService;
 	private final UserService userService;
 	private final SkillService skillService;
-	private final LlmCvProcessingService llmCvProcessingService;
 
 	@GetMapping("/{id}")
 	public String viewProfile(final Model model, final @PathVariable Long id)
 	{
 		final Candidate candidate = candidateService.findById(id);
+		model.addAttribute("candidate", candidate);
+		return "candidates/profile";
+	}
+
+	@PreAuthorize("@securityUtil.isCandidate()")
+	@GetMapping("/me")
+	public String viewProfileForCurrentCandidate(final Model model, @AuthenticationPrincipal final UserDetails userDetails)
+	{
+		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
 		model.addAttribute("candidate", candidate);
 		return "candidates/profile";
 	}

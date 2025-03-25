@@ -1,5 +1,6 @@
 package com.butenov.jobplatform.jobapplications.model;
 
+import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.candidates.model.Candidate;
 
@@ -23,11 +24,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "job_application")
-public class JobApplication {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
+public class JobApplication extends BaseEntity
+{
 	@Enumerated(EnumType.STRING)
 	private Status status;
 
@@ -41,7 +39,8 @@ public class JobApplication {
 	@JoinColumn(name = "job_id")
 	private Job job;
 
-	public enum Status {
+	public enum Status
+	{
 		PENDING, ACCEPTED, REJECTED
 	}
 }
