@@ -4,6 +4,7 @@ import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.jobs.model.Job;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -30,5 +31,8 @@ public class JobCandidateMatch extends BaseEntity
 	private Candidate candidate;
 
 	private Double matchScore;
+
+	@Column(columnDefinition = "TEXT")
+	private String intellectualAnalysisJustification;
 
 }

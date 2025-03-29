@@ -9,6 +9,7 @@ import com.butenov.jobplatform.users.model.Recruiter;
 import com.butenov.jobplatform.skills.model.Skill;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +27,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(JobEntityListener.class)
 public class Job extends BaseEntity
 {
 	private String title;

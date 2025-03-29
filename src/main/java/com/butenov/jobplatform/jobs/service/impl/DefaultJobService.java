@@ -1,7 +1,5 @@
 package com.butenov.jobplatform.jobs.service.impl;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
