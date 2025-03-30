@@ -14,6 +14,7 @@ import com.butenov.jobplatform.candidates.repository.CandidateRepository;
 import com.butenov.jobplatform.candidates.service.CandidateService;
 import com.butenov.jobplatform.candidates.service.LlmCvProcessingService;
 import com.butenov.jobplatform.commons.files.service.FileService;
+import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.skills.model.Skill;
 import com.butenov.jobplatform.skills.repository.SkillRepository;
 
@@ -25,10 +26,12 @@ import lombok.AllArgsConstructor;
 @Service
 public class DefaultCandidateService implements CandidateService
 {
+	public static final String ENTITY_NOT_FOUND_EXCEPTION = "Candidate with id %d not found";
 	private final FileService fileService;
 	private final CandidateRepository candidateRepository;
 	private final SkillRepository skillRepository;
 	private final LlmCvProcessingService llmCvProcessingService;
+	private final JobCandidateMatchService jobCandidateMatchService;
 
 	@Override
 	public Candidate findById(final Long id)
@@ -91,6 +94,19 @@ public class DefaultCandidateService implements CandidateService
 		                                            .toList();
 		candidate.setSkills(new HashSet<>(matchedSkills));
 
-		return candidateRepository.save(candidate);
+		return update(candidate);
+	}
+
+	@Transactional
+	@Override
+	public Candidate update(final Candidate candidate)
+	{
+		final long id = candidate.getId();
+		if (candidateRepository.existsById(id))
+		{
+			jobCandidateMatchService.delete(candidate);
+			return candidateRepository.save(candidate);
+		}
+		throw new EntityNotFoundException(ENTITY_NOT_FOUND_EXCEPTION.formatted(id));
 	}
 }

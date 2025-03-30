@@ -2,7 +2,6 @@ package com.butenov.jobplatform.jobapplications.controller;
 
 import java.util.List;
 
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,17 +12,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.butenov.jobplatform.candidates.service.CandidateUtil;
 import com.butenov.jobplatform.commons.SecurityUtil;
 import com.butenov.jobplatform.jobapplications.model.JobApplication;
 import com.butenov.jobplatform.jobapplications.service.JobApplicationService;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.service.JobService;
 import com.butenov.jobplatform.candidates.model.Candidate;
-import com.butenov.jobplatform.users.model.User;
 import com.butenov.jobplatform.users.service.UserService;
+
+import lombok.AllArgsConstructor;
 
 @Controller
 @RequestMapping("/applications")
+@AllArgsConstructor
 public class JobApplicationController
 {
 
@@ -31,26 +33,13 @@ public class JobApplicationController
 	private final JobService jobService;
 	private final UserService userService;
 	private final SecurityUtil securityUtil;
-
-	public JobApplicationController(final JobApplicationService jobApplicationService, final JobService jobService,
-	                                final UserService userService, final SecurityUtil securityUtil)
-	{
-		this.jobApplicationService = jobApplicationService;
-		this.jobService = jobService;
-		this.userService = userService;
-		this.securityUtil = securityUtil;
-	}
+	private final CandidateUtil candidateUtil;
 
 	@PreAuthorize("@securityUtil.isCandidate()")
 	@PostMapping("/apply/{jobId}")
-	public String applyForJob(@PathVariable final Long jobId, @AuthenticationPrincipal final UserDetails userDetails)
+	public String applyForJob(@PathVariable final Long jobId)
 	{
-		final User user = userService.findByEmail(userDetails.getUsername());
-
-		if (!(user instanceof final Candidate candidate))
-		{
-			throw new AccessDeniedException("Only candidates can apply for jobs");
-		}
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 
 		final Job job = jobService.findById(jobId);
 
@@ -76,11 +65,9 @@ public class JobApplicationController
 
 	@PreAuthorize("@securityUtil.isCandidate()")
 	@GetMapping("/")
-	public String viewCandidateApplications(final Model model, @AuthenticationPrincipal final UserDetails userDetails)
+	public String viewCandidateApplications(final Model model)
 	{
-		final User user = userService.findByEmail(userDetails.getUsername());
-
-		final Candidate candidate = (Candidate) user;
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 
 		final List<JobApplication> applications = jobApplicationService.findByCandidateId(candidate.getId());
 		model.addAttribute("jobApplications", applications);

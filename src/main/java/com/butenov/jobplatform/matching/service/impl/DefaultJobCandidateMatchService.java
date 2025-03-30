@@ -1,11 +1,7 @@
 package com.butenov.jobplatform.matching.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -18,6 +14,7 @@ import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.matching.service.LlmIntellectualJobCandidateMatchService;
 import com.butenov.jobplatform.skills.model.Skill;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,6 +24,7 @@ public class DefaultJobCandidateMatchService implements JobCandidateMatchService
 	private final JobCandidateMatchRepository jobCandidateMatchRepository;
 	private final LlmIntellectualJobCandidateMatchService llmIntellectualJobCandidateMatchService;
 
+	@Transactional
 	@Override
 	public JobCandidateMatch calculateAndStoreMatchScore(final Job job, final Candidate candidate)
 	{
@@ -48,11 +46,26 @@ public class DefaultJobCandidateMatchService implements JobCandidateMatchService
 
 	}
 
+	@Transactional
 	@Override
 	public JobCandidateMatch getJobMatchScore(final Job job, final Candidate candidate)
 	{
 		return jobCandidateMatchRepository.findByJobAndCandidate(job, candidate)
 		                                  .orElse(calculateAndStoreMatchScore(job, candidate));
+	}
+
+	@Transactional
+	@Override
+	public void delete(final Job job)
+	{
+		jobCandidateMatchRepository.deleteByJob(job);
+	}
+
+	@Transactional
+	@Override
+	public void delete(final Candidate candidate)
+	{
+		jobCandidateMatchRepository.deleteByCandidate(candidate);
 	}
 
 	private double calculateSkillMatch(final Job job, final Candidate candidate)

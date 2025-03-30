@@ -16,4 +16,6 @@ public interface CandidateService
 
 	@Transactional
 	Candidate updateCandidateFromCV(Candidate candidate);
+
+	Candidate update(Candidate candidate);
 }

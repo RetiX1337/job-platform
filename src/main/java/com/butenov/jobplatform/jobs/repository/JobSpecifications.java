@@ -59,13 +59,14 @@ public class JobSpecifications
 	public static Specification<Job> sortByMatchingSkills(final Set<Long> candidateSkillIds)
 	{
 		return (root, query, criteriaBuilder) -> {
-			// Check if the query result type is not Long (i.e. not a count query)
-			if (!query.getResultType().equals(Long.class)) {
+			if (!query.getResultType().equals(Long.class))
+			{
 				final Join<Job, Skill> jobSkillsJoin = root.join("requiredSkills", JoinType.LEFT);
-				Expression<Long> matchingSkillsCount = criteriaBuilder.count(jobSkillsJoin.get("id"));
+				final Expression<Long> matchingSkillsCount = criteriaBuilder.count(jobSkillsJoin.get("id"));
 
-				if (candidateSkillIds != null && !candidateSkillIds.isEmpty()) {
-					Predicate matchingSkills = jobSkillsJoin.get("id").in(candidateSkillIds);
+				if (candidateSkillIds != null && !candidateSkillIds.isEmpty())
+				{
+					final Predicate matchingSkills = jobSkillsJoin.get("id").in(candidateSkillIds);
 					query.where(criteriaBuilder.or(matchingSkills, jobSkillsJoin.get("id").isNull()));
 				}
 

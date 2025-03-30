@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.butenov.jobplatform.candidates.model.Candidate;
+import com.butenov.jobplatform.candidates.service.CandidateUtil;
 import com.butenov.jobplatform.companies.model.Company;
 import com.butenov.jobplatform.companies.service.CompanyService;
 import com.butenov.jobplatform.jobs.dto.JobIntellectualSearchResult;
@@ -37,8 +38,8 @@ public class JobSearchController
 	private final SkillService skillService;
 	private final CompanyService companyService;
 	private final UserService userService;
+	private final CandidateUtil candidateUtil;
 
-	@PreAuthorize("@securityUtil.isCandidate()")
 	@GetMapping("/search")
 	public String searchJobs(
 			@ModelAttribute final JobSearchCriteria criteria, @RequestParam(defaultValue = "0") final int page,
@@ -68,7 +69,7 @@ public class JobSearchController
 			@RequestParam(defaultValue = "10") final int size, final Model model, @AuthenticationPrincipal final UserDetails userDetails)
 	{
 		final Pageable pageable = PageRequest.of(page, size);
-		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 		final Page<JobIntellectualSearchResult> jobPage = jobSearchService.findMostFittingJobs(criteria, candidate, pageable);
 
 		final List<Skill> allSkills = skillService.findAll();

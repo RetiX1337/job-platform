@@ -9,4 +9,8 @@ public interface JobCandidateMatchService
 	JobCandidateMatch calculateAndStoreMatchScore(Job job, Candidate candidate);
 
 	JobCandidateMatch getJobMatchScore(Job job, Candidate candidate);
+
+	void delete(Job job);
+
+	void delete(Candidate candidate);
 }

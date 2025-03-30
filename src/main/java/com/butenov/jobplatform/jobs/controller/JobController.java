@@ -11,19 +11,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.butenov.jobplatform.candidates.service.CandidateUtil;
 import com.butenov.jobplatform.commons.SecurityUtil;
 import com.butenov.jobplatform.jobs.converter.JobConverter;
 import com.butenov.jobplatform.jobs.dto.JobForm;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.service.JobService;
+import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.skills.service.SkillService;
 import com.butenov.jobplatform.users.model.Recruiter;
 import com.butenov.jobplatform.users.model.User;
 import com.butenov.jobplatform.users.service.UserService;
 
+import lombok.AllArgsConstructor;
+
 
 @Controller
 @RequestMapping("/jobs")
+@AllArgsConstructor
 public class JobController
 {
 
@@ -32,23 +37,20 @@ public class JobController
 	private final SkillService skillService;
 	private final UserService userService;
 	private final SecurityUtil securityUtil;
-
-	public JobController(final JobService jobService, final JobConverter jobConverter,
-	                     final SkillService skillService, final UserService userService, final SecurityUtil securityUtil)
-	{
-		this.jobService = jobService;
-		this.jobConverter = jobConverter;
-		this.skillService = skillService;
-		this.userService = userService;
-		this.securityUtil = securityUtil;
-	}
+	private final JobCandidateMatchService jobCandidateMatchService;
+	private final CandidateUtil candidateUtil;
 
 	@GetMapping("/{id}")
-	public String showJob(@PathVariable final Long id, final Model model) {
+	public String showJob(@PathVariable final Long id, final Model model)
+	{
 		final Job job = jobService.findById(id);
-		final JobForm jobForm = jobConverter.convertToDto(job);
 
-		model.addAttribute("job", jobForm);
+		model.addAttribute("job", job);
+		if (securityUtil.isCandidate())
+		{
+			model.addAttribute("jobCandidateMatch",
+					jobCandidateMatchService.getJobMatchScore(job, candidateUtil.getAuthenticatedCandidate()));
+		}
 		return "jobs/details";
 	}
 
@@ -76,7 +78,7 @@ public class JobController
 
 		jobForm.setCompanyId(recruiter.getCompany().getId());
 
-		return saveJob(jobForm, model);
+		return saveJob(jobForm, model, false);
 	}
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
@@ -99,7 +101,7 @@ public class JobController
 		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, existingJob);
 
 		jobForm.setCompanyId(existingJob.getCompany().getId());
-		return saveJob(jobForm, model);
+		return saveJob(jobForm, model, true);
 	}
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
@@ -139,12 +141,19 @@ public class JobController
 		return recruiter;
 	}
 
-	private String saveJob(final JobForm jobForm, final Model model)
+	private String saveJob(final JobForm jobForm, final Model model, final boolean isUpdate)
 	{
 		try
 		{
 			final Job job = jobConverter.convertToEntity(jobForm);
-			jobService.save(job);
+			if (isUpdate)
+			{
+				jobService.update(job);
+			}
+			else
+			{
+				jobService.save(job);
+			}
 			return "redirect:/jobs";
 		}
 		catch (final Exception e)

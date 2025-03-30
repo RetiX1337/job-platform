@@ -7,20 +7,29 @@
 <body>
 
 <h2 th:text="${job.title}"></h2>
-<p><strong>Company:</strong> <span th:text="${job.getCompanyId()}"></span></p>
+<p><strong>Company:</strong> <span th:text="${job.getCompany().getName()}"></span></p>
 <p><strong>Location:</strong> <span th:text="${job.location}"></span></p>
 <p><strong>Description:</strong> <span th:text="${job.description}"></span></p>
 <p><strong>Requirements:</strong> <span th:text="${job.requirements}"></span></p>
 
 <h3>Required Skills</h3>
 <ul>
-    <li th:each="skill : ${job.requiredSkillIds}" th:text="${skill}"></li>
+    <li th:each="skill : ${job.requiredSkills}" th:text="${skill.getName()}"></li>
 </ul>
 
-<form sec:authorize="@securityUtil.isCandidate()" th:action="@{/applications/apply/__${id}__}" method="post">
-    <input type="hidden" name="jobId" th:value="${job.id}"/>
-    <button type="submit">Apply for this Job</button>
-</form>
+<div th:if="${jobCandidateMatch != null}">
+    <p>Intellectual Job Match</p>
+    <p th:text="${#numbers.formatDecimal(jobCandidateMatch.matchScore * 100, 1, 0)} + '%'"></p>
+    <p th:text="${jobCandidateMatch.intellectualAnalysisJustification}"></p>
+</div>
+
+<div sec:authorize="@securityUtil.isCandidate()">
+    <form th:if="${!@candidateUtil.hasAlreadyApplied(job)}" th:action="@{/applications/apply/__${id}__}" method="post">
+        <input type="hidden" name="jobId" th:value="${job.id}"/>
+        <button type="submit">Apply for this Job</button>
+    </form>
+    <p th:if="${@candidateUtil.hasAlreadyApplied(job)}">You have already applied for this job.</p>
+</div>
 
 <a href="/jobs">Back to Job Listings</a>
 

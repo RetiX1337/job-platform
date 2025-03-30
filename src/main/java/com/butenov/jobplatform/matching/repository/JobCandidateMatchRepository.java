@@ -11,4 +11,8 @@ import com.butenov.jobplatform.matching.model.JobCandidateMatch;
 public interface JobCandidateMatchRepository extends JpaRepository<JobCandidateMatch, Long>
 {
 	Optional<JobCandidateMatch> findByJobAndCandidate(Job job, Candidate candidate);
+
+	void deleteByJob(Job job);
+
+	void deleteByCandidate(Candidate candidate);
 }

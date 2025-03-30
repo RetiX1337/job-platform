@@ -28,10 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.butenov.jobplatform.candidates.dto.CandidateProfileEditingDto;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.candidates.service.CandidateService;
-import com.butenov.jobplatform.candidates.service.LlmCvProcessingService;
+import com.butenov.jobplatform.candidates.service.CandidateUtil;
 import com.butenov.jobplatform.skills.model.Skill;
 import com.butenov.jobplatform.skills.service.SkillService;
-import com.butenov.jobplatform.users.service.UserService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -43,8 +42,8 @@ import lombok.extern.java.Log;
 public class CandidateController
 {
 	private final CandidateService candidateService;
-	private final UserService userService;
 	private final SkillService skillService;
+	private final CandidateUtil candidateUtil;
 
 	@GetMapping("/{id}")
 	public String viewProfile(final Model model, final @PathVariable Long id)
@@ -56,9 +55,9 @@ public class CandidateController
 
 	@PreAuthorize("@securityUtil.isCandidate()")
 	@GetMapping("/me")
-	public String viewProfileForCurrentCandidate(final Model model, @AuthenticationPrincipal final UserDetails userDetails)
+	public String viewProfileForCurrentCandidate(final Model model)
 	{
-		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 		model.addAttribute("candidate", candidate);
 		return "candidates/profile";
 	}
@@ -73,10 +72,9 @@ public class CandidateController
 	@PreAuthorize("@securityUtil.isCandidate()")
 	@PostMapping("/edit")
 	public String updateProfile(
-			@ModelAttribute("candidateProfileEditingDto") final CandidateProfileEditingDto candidateProfileEditingDto,
-			@AuthenticationPrincipal final UserDetails userDetails)
+			@ModelAttribute("candidateProfileEditingDto") final CandidateProfileEditingDto candidateProfileEditingDto)
 	{
-		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 
 		candidate.setFirstName(candidateProfileEditingDto.getFirstName());
 		candidate.setLastName(candidateProfileEditingDto.getLastName());
@@ -104,7 +102,7 @@ public class CandidateController
 			                          .forEach(skillId -> candidate.getSkills().add(skillService.findById(skillId)));
 		}
 
-		candidateService.save(candidate);
+		candidateService.update(candidate);
 
 		return "redirect:/candidates/" + candidate.getId();
 	}
@@ -112,12 +110,11 @@ public class CandidateController
 	@PreAuthorize("@securityUtil.isCandidate()")
 	@PostMapping("/upload-cv")
 	public ResponseEntity<String> uploadCV(
-			@RequestParam("cvFile") final MultipartFile file,
-			@AuthenticationPrincipal final UserDetails userDetails)
+			@RequestParam("cvFile") final MultipartFile file)
 	{
 		try
 		{
-			final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+			final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 
 			candidateService.uploadCV(candidate, file);
 
@@ -153,12 +150,13 @@ public class CandidateController
 		                     .body(resource);
 	}
 
+	@PreAuthorize("@securityUtil.isCandidate()")
 	@PostMapping("/update-from-cv")
 	public String updateCandidateFromCV(@AuthenticationPrincipal final UserDetails userDetails, final Model model)
 	{
 		try
 		{
-			final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+			final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 			if (candidate.getCvLink() == null || candidate.getCvLink().isEmpty())
 			{
 				model.addAttribute("error", "No CV found for this candidate.");
@@ -179,7 +177,7 @@ public class CandidateController
 
 	private String prepareCandidateEditForm(final Model model, final UserDetails userDetails)
 	{
-		final Candidate candidate = (Candidate) userService.findByEmail(userDetails.getUsername());
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 
 		if (candidate.getEducations() == null)
 		{

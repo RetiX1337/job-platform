@@ -7,20 +7,19 @@ import org.springframework.stereotype.Service;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.repository.JobRepository;
 import com.butenov.jobplatform.jobs.service.JobService;
+import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class DefaultJobService implements JobService
 {
 	public static final String ENTITY_NOT_FOUND_EXCEPTION = "Job with id %d not found";
 	private final JobRepository jobRepository;
-
-	public DefaultJobService(final JobRepository jobRepository)
-	{
-		this.jobRepository = jobRepository;
-	}
+	private final JobCandidateMatchService jobCandidateMatchService;
 
 	@Transactional
 	@Override
@@ -49,12 +48,14 @@ public class DefaultJobService implements JobService
 		jobRepository.delete(findById(id));
 	}
 
+	@Transactional
 	@Override
 	public Job update(final Job job)
 	{
 		final long id = job.getId();
 		if (jobRepository.existsById(id))
 		{
+			jobCandidateMatchService.delete(job);
 			return jobRepository.save(job);
 		}
 		throw new EntityNotFoundException(ENTITY_NOT_FOUND_EXCEPTION.formatted(id));

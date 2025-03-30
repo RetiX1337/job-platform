@@ -32,8 +32,14 @@ public class DefaultJobSearchService implements JobSearchService
 	@Override
 	public Page<Job> searchJobs(final JobSearchCriteria criteria, final Pageable pageable)
 	{
-		final Specification<Job> spec = JobSpecifications.withFilters(criteria.getTitle(), criteria.getLocation(),
-				criteria.getMinSalary(), criteria.getMaxSalary(), criteria.getRequiredSkillIds(), criteria.getCompanyIds());
+		final Specification<Job> spec = JobSpecifications.withFilters(
+				criteria.getTitle(),
+				criteria.getLocation(),
+				criteria.getMinSalary(),
+				criteria.getMaxSalary(),
+				criteria.getRequiredSkillIds(),
+				criteria.getCompanyIds()
+		);
 		return jobRepository.findAll(spec, pageable);
 	}
 
