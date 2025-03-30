@@ -5,6 +5,12 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.Set;
 
 import com.butenov.jobplatform.jobs.model.Job;
+import com.butenov.jobplatform.skills.model.Skill;
+
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 
 public class JobSpecifications
 {
@@ -47,6 +53,27 @@ public class JobSpecifications
 			}
 
 			return spec.toPredicate(root, query, criteriaBuilder);
+		};
+	}
+
+	public static Specification<Job> sortByMatchingSkills(final Set<Long> candidateSkillIds)
+	{
+		return (root, query, criteriaBuilder) -> {
+			// Check if the query result type is not Long (i.e. not a count query)
+			if (!query.getResultType().equals(Long.class)) {
+				final Join<Job, Skill> jobSkillsJoin = root.join("requiredSkills", JoinType.LEFT);
+				Expression<Long> matchingSkillsCount = criteriaBuilder.count(jobSkillsJoin.get("id"));
+
+				if (candidateSkillIds != null && !candidateSkillIds.isEmpty()) {
+					Predicate matchingSkills = jobSkillsJoin.get("id").in(candidateSkillIds);
+					query.where(criteriaBuilder.or(matchingSkills, jobSkillsJoin.get("id").isNull()));
+				}
+
+				query.groupBy(root.get("id"));
+				query.orderBy(criteriaBuilder.desc(matchingSkillsCount));
+			}
+
+			return criteriaBuilder.conjunction();
 		};
 	}
 }
