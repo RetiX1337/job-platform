@@ -7,12 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +20,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class JobExperience extends BaseEntity
 {
 	private String jobTitle;
@@ -35,6 +34,6 @@ public class JobExperience extends BaseEntity
 
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "candidate_id")
-	private Candidate candidate;
+	@JoinColumn(name = "candidate_profile_id")
+	private CandidateProfile candidateProfile;
 }

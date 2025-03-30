@@ -8,14 +8,12 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import com.butenov.jobplatform.candidates.dto.LlmCvProcessingDto;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.matching.dto.CandidateMatchingDto;
 import com.butenov.jobplatform.matching.dto.JobCandidateMatchDto;
 import com.butenov.jobplatform.matching.dto.JobMatchingDto;
 import com.butenov.jobplatform.matching.service.LlmIntellectualJobCandidateMatchService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -38,8 +36,8 @@ public class DefaultLlmIntellectualJobCandidateMatchService implements LlmIntell
 					new ClassPathResource("llm-prompts/job-candidate-match-prompt.txt").getFile().toPath()
 			));
 
-			final CandidateMatchingDto candidateMatchingDto = new CandidateMatchingDto(candidate.getJobExperiences(),
-					new ArrayList<>(candidate.getSkills()), candidate.getEducations());
+			final CandidateMatchingDto candidateMatchingDto = new CandidateMatchingDto(candidate.getCandidateProfile().getJobExperiences(),
+					new ArrayList<>(candidate.getCandidateProfile().getSkills()), candidate.getCandidateProfile().getEducations());
 			final JobMatchingDto jobMatchingDto = JobMatchingDto.builder()
 			                                                    .title(job.getTitle())
 			                                                    .description(job.getDescription())

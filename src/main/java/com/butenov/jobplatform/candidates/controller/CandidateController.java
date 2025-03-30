@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -79,27 +80,27 @@ public class CandidateController
 		candidate.setFirstName(candidateProfileEditingDto.getFirstName());
 		candidate.setLastName(candidateProfileEditingDto.getLastName());
 
-		candidate.getJobExperiences().clear();
+		candidate.getCandidateProfile().getJobExperiences().clear();
 		if (candidateProfileEditingDto.getJobExperienceList() != null)
 		{
 			candidateProfileEditingDto.getJobExperienceList()
-			                          .forEach(jobExperience -> jobExperience.setCandidate(candidate));
-			candidate.getJobExperiences().addAll(candidateProfileEditingDto.getJobExperienceList());
+			                          .forEach(jobExperience -> jobExperience.setCandidateProfile(candidate.getCandidateProfile()));
+			candidate.getCandidateProfile().getJobExperiences().addAll(candidateProfileEditingDto.getJobExperienceList());
 		}
 
-		candidate.getEducations().clear();
+		candidate.getCandidateProfile().getEducations().clear();
 		if (candidateProfileEditingDto.getEducationList() != null)
 		{
 			candidateProfileEditingDto.getEducationList()
-			                          .forEach(education -> education.setCandidate(candidate));
-			candidate.getEducations().addAll(candidateProfileEditingDto.getEducationList());
+			                          .forEach(education -> education.setCandidateProfile(candidate.getCandidateProfile()));
+			candidate.getCandidateProfile().getEducations().addAll(candidateProfileEditingDto.getEducationList());
 		}
 
 		if (candidateProfileEditingDto.getSkillIds() != null)
 		{
-			candidate.getSkills().clear();
+			candidate.getCandidateProfile().getSkills().clear();
 			candidateProfileEditingDto.getSkillIds()
-			                          .forEach(skillId -> candidate.getSkills().add(skillService.findById(skillId)));
+			                          .forEach(skillId -> candidate.getCandidateProfile().getSkills().add(skillService.findById(skillId)));
 		}
 
 		candidateService.update(candidate);
@@ -179,13 +180,13 @@ public class CandidateController
 	{
 		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 
-		if (candidate.getEducations() == null)
+		if (candidate.getCandidateProfile().getEducations() == null)
 		{
-			candidate.setEducations(new ArrayList<>());
+			candidate.getCandidateProfile().setEducations(new ArrayList<>());
 		}
-		if (candidate.getJobExperiences() == null)
+		if (candidate.getCandidateProfile().getJobExperiences() == null)
 		{
-			candidate.setJobExperiences(new ArrayList<>());
+			candidate.getCandidateProfile().setJobExperiences(new ArrayList<>());
 		}
 
 		final CandidateProfileEditingDto candidateProfileEditingDto =
@@ -194,9 +195,9 @@ public class CandidateController
 				                          .cvLink(candidate.getCvLink())
 				                          .firstName(candidate.getFirstName())
 				                          .lastName(candidate.getLastName())
-				                          .jobExperienceList(new ArrayList<>(candidate.getJobExperiences()))
-				                          .educationList(new ArrayList<>(candidate.getEducations()))
-				                          .skillIds(candidate.getSkills().stream().map(Skill::getId).toList())
+				                          .jobExperienceList(new ArrayList<>(candidate.getCandidateProfile().getJobExperiences()))
+				                          .educationList(new ArrayList<>(candidate.getCandidateProfile().getEducations()))
+				                          .skillIds(candidate.getCandidateProfile().getSkills().stream().map(Skill::getId).toList())
 				                          .build();
 
 		model.addAttribute("candidateProfileEditingDto", candidateProfileEditingDto);

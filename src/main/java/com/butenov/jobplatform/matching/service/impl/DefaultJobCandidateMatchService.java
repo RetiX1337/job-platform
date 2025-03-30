@@ -71,7 +71,7 @@ public class DefaultJobCandidateMatchService implements JobCandidateMatchService
 	private double calculateSkillMatch(final Job job, final Candidate candidate)
 	{
 		final Set<Skill> jobSkills = job.getRequiredSkills();
-		final Set<Skill> candidateSkills = candidate.getSkills();
+		final Set<Skill> candidateSkills = candidate.getCandidateProfile().getSkills();
 
 		if (jobSkills == null || jobSkills.isEmpty())
 		{

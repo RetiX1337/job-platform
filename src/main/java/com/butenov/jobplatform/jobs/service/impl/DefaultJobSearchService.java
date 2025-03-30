@@ -47,7 +47,7 @@ public class DefaultJobSearchService implements JobSearchService
 	public Page<JobIntellectualSearchResult> findMostFittingJobs(final JobSearchCriteria criteria, final Candidate candidate,
 	                                                             final Pageable pageable)
 	{
-		final Specification<Job> sortByMatchingSkills = JobSpecifications.sortByMatchingSkills(candidate.getSkills().stream()
+		final Specification<Job> sortByMatchingSkills = JobSpecifications.sortByMatchingSkills(candidate.getCandidateProfile().getSkills().stream()
 		                                                                                                .map(Skill::getId)
 		                                                                                                .collect(Collectors.toSet()));
 		final Specification<Job> spec = JobSpecifications.withFilters(
@@ -84,7 +84,7 @@ public class DefaultJobSearchService implements JobSearchService
 
 	private double preliminaryScore(final Job job, final Candidate candidate)
 	{
-		final long matchingSkills = job.getRequiredSkills().stream().filter(candidate.getSkills()::contains).count();
+		final long matchingSkills = job.getRequiredSkills().stream().filter(candidate.getCandidateProfile().getSkills()::contains).count();
 
 		return job.getRequiredSkills().isEmpty() ? 0 : (double) matchingSkills / job.getRequiredSkills().size();
 	}

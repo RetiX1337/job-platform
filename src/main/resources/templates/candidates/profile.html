@@ -13,7 +13,7 @@
 
     <h3>Skills</h3>
     <ul>
-        <li th:each="skill : ${candidate.skills}" th:text="${skill.name}"></li>
+        <li th:each="skill : ${candidate.candidateProfile.skills}" th:text="${skill.name}"></li>
     </ul>
 
     <h3>Job Experience</h3>
@@ -25,7 +25,7 @@
             <th>Duration</th>
             <th>Description</th>
         </tr>
-        <tr th:each="experience : ${candidate.jobExperiences}">
+        <tr th:each="experience : ${candidate.candidateProfile.jobExperiences}">
             <td th:text="${experience.jobTitle}"></td>
             <td th:text="${experience.companyName}"></td>
             <td th:text="${experience.location}"></td>
@@ -43,7 +43,7 @@
             <th>Duration</th>
             <th>Description</th>
         </tr>
-        <tr th:each="education : ${candidate.educations}">
+        <tr th:each="education : ${candidate.candidateProfile.educations}">
             <td th:text="${education.degree}"></td>
             <td th:text="${education.schoolName}"></td>
             <td th:text="${education.fieldOfStudy}"></td>

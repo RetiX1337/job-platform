@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.butenov.jobplatform.candidates.model.CandidateProfile;
 import com.butenov.jobplatform.security.dto.CandidateRegistrationInfo;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.users.model.Role;
@@ -35,6 +36,10 @@ public class CandidateRegistrationService
 		candidate.setEmail(candidateRegistrationInfo.getEmail());
 		candidate.setPassword(encodedPassword);
 		candidate.setRoles(Set.of(Role.ROLE_CANDIDATE));
+
+		final CandidateProfile candidateProfile = new CandidateProfile();
+		candidateProfile.setCandidate(candidate);
+		candidate.setCandidateProfile(candidateProfile);
 
 		userService.save(candidate);
 	}
