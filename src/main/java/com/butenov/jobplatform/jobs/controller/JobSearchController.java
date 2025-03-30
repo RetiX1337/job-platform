@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +23,6 @@ import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.service.JobSearchService;
 import com.butenov.jobplatform.skills.model.Skill;
 import com.butenov.jobplatform.skills.service.SkillService;
-import com.butenov.jobplatform.users.service.UserService;
 
 import lombok.AllArgsConstructor;
 
@@ -37,7 +34,6 @@ public class JobSearchController
 	private final JobSearchService jobSearchService;
 	private final SkillService skillService;
 	private final CompanyService companyService;
-	private final UserService userService;
 	private final CandidateUtil candidateUtil;
 
 	@GetMapping("/search")
@@ -66,7 +62,7 @@ public class JobSearchController
 	@GetMapping("/search-intellectual")
 	public String searchJobsIntellectual(
 			@ModelAttribute final JobSearchCriteria criteria, @RequestParam(defaultValue = "0") final int page,
-			@RequestParam(defaultValue = "10") final int size, final Model model, @AuthenticationPrincipal final UserDetails userDetails)
+			@RequestParam(defaultValue = "10") final int size, final Model model)
 	{
 		final Pageable pageable = PageRequest.of(page, size);
 		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();

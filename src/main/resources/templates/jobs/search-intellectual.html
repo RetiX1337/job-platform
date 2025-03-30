@@ -2,11 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Job Search</title>
+    <script>
+        function goToPage(pageNumber) {
+            document.getElementById("page").value = pageNumber;
+            document.getElementById("searchForm").submit();
+        }
+    </script>
 </head>
 <body>
 
-<!-- Job Search Form -->
-<form th:action="@{/jobs/search}" method="get">
+<form id="searchForm" th:action="@{/jobs/search-intellectual}" method="get">
     <input type="text" name="title" th:value="${criteria.title}" placeholder="Job Title" />
     <input type="text" name="location" th:value="${criteria.location}" placeholder="Location" />
     <input type="number" name="minSalary" th:value="${criteria.minSalary}" placeholder="Min Salary" />
@@ -30,6 +35,7 @@
         </option>
     </select>
 
+    <input type="hidden" id="page" name="page" th:value="${currentPage}" />
     <button type="submit">Search</button>
 </form>
 
@@ -52,12 +58,11 @@
     </ul>
 
 
-    <!-- Pagination -->
     <div>
         <span>Page: </span>
-        <a th:href="@{/jobs(page=${currentPage - 1}, size=${size})}" th:if="${currentPage > 0}">Previous</a> |
+        <a href="#" th:if="${currentPage > 0}" th:onclick="|goToPage(${currentPage - 1})|">Previous</a> |
         <span th:text="${currentPage + 1}"></span> |
-        <a th:href="@{/jobs(page=${currentPage + 1}, size=${size})}" th:if="${currentPage < totalPages - 1}">Next</a>
+        <a href="#" th:if="${currentPage < totalPages - 1}" th:onclick="|goToPage(${currentPage + 1})|">Next</a>
     </div>
 
     <div>
