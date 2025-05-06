@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -30,6 +30,8 @@ import com.butenov.jobplatform.candidates.dto.CandidateProfileEditingDto;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.candidates.service.CandidateService;
 import com.butenov.jobplatform.candidates.service.CandidateUtil;
+import com.butenov.jobplatform.jobs.model.Job;
+import com.butenov.jobplatform.jobs.service.JobService;
 import com.butenov.jobplatform.skills.model.Skill;
 import com.butenov.jobplatform.skills.service.SkillService;
 
@@ -45,6 +47,7 @@ public class CandidateController
 	private final CandidateService candidateService;
 	private final SkillService skillService;
 	private final CandidateUtil candidateUtil;
+	private final JobService jobService;
 
 	@GetMapping("/{id}")
 	public String viewProfile(final Model model, final @PathVariable Long id)
@@ -77,33 +80,7 @@ public class CandidateController
 	{
 		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 
-		candidate.setFirstName(candidateProfileEditingDto.getFirstName());
-		candidate.setLastName(candidateProfileEditingDto.getLastName());
-
-		candidate.getCandidateProfile().getJobExperiences().clear();
-		if (candidateProfileEditingDto.getJobExperienceList() != null)
-		{
-			candidateProfileEditingDto.getJobExperienceList()
-			                          .forEach(jobExperience -> jobExperience.setCandidateProfile(candidate.getCandidateProfile()));
-			candidate.getCandidateProfile().getJobExperiences().addAll(candidateProfileEditingDto.getJobExperienceList());
-		}
-
-		candidate.getCandidateProfile().getEducations().clear();
-		if (candidateProfileEditingDto.getEducationList() != null)
-		{
-			candidateProfileEditingDto.getEducationList()
-			                          .forEach(education -> education.setCandidateProfile(candidate.getCandidateProfile()));
-			candidate.getCandidateProfile().getEducations().addAll(candidateProfileEditingDto.getEducationList());
-		}
-
-		if (candidateProfileEditingDto.getSkillIds() != null)
-		{
-			candidate.getCandidateProfile().getSkills().clear();
-			candidateProfileEditingDto.getSkillIds()
-			                          .forEach(skillId -> candidate.getCandidateProfile().getSkills().add(skillService.findById(skillId)));
-		}
-
-		candidateService.update(candidate);
+		candidateService.updateCandidateProfile(candidate, candidateProfileEditingDto);
 
 		return "redirect:/candidates/" + candidate.getId();
 	}
@@ -174,6 +151,17 @@ public class CandidateController
 			model.addAttribute("error", "An error occurred while updating your profile.");
 			return prepareCandidateEditForm(model, userDetails);
 		}
+	}
+
+	@PreAuthorize("@securityUtil.isCandidate()")
+	@GetMapping("/bookmarks")
+	public String viewBookmarks(final Model model)
+	{
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
+		final Set<Job> bookmarkedJobs = candidate.getBookmarkedJobs();
+
+		model.addAttribute("bookmarkedJobs", bookmarkedJobs);
+		return "candidates/bookmarks";
 	}
 
 	private String prepareCandidateEditForm(final Model model, final UserDetails userDetails)

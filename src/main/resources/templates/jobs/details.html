@@ -31,6 +31,16 @@
     <p th:if="${@candidateUtil.hasAlreadyApplied(job)}">You have already applied for this job.</p>
 </div>
 
+<div sec:authorize="@securityUtil.isCandidate()">
+    <form th:action="@{'/jobs/bookmark/' + ${job.id}}" method="post">
+        <button type="submit" style="background: none; border: none; cursor: pointer;">
+            <span th:if="${bookmark}">♥</span>
+            <span th:unless="${bookmark}">♡</span>
+        </button>
+    </form>
+</div>
+
+
 <a href="/jobs">Back to Job Listings</a>
 
 </body>

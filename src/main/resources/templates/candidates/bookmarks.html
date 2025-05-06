@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookmarked Jobs</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+
+<h1>Your Bookmarked Jobs</h1>
+
+<div th:if="${#lists.isEmpty(bookmarkedJobs)}">
+    <p>You haven't bookmarked any jobs yet.</p>
+</div>
+
+<div th:unless="${#lists.isEmpty(bookmarkedJobs)}">
+    <ul>
+        <li th:each="job : ${bookmarkedJobs}">
+            <a th:href="@{'/jobs/' + ${job.id}}">
+                <h2 th:text="${job.title}">Job Title</h2>
+            </a>
+            <p th:text="${job.company.name}">Company Name</p>
+            <p th:text="${job.location}">Location</p>
+
+            <form th:action="@{'/jobs/bookmark/' + ${job.id}}" method="post" style="display: inline;">
+                <button type="submit" style="background: none; border: none; cursor: pointer;">♥</button>
+            </form>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

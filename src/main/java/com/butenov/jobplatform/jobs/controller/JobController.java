@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.butenov.jobplatform.candidates.model.Candidate;
+import com.butenov.jobplatform.candidates.service.CandidateService;
 import com.butenov.jobplatform.candidates.service.CandidateUtil;
 import com.butenov.jobplatform.commons.SecurityUtil;
 import com.butenov.jobplatform.jobs.converter.JobConverter;
@@ -36,6 +39,7 @@ public class JobController
 	private final JobConverter jobConverter;
 	private final SkillService skillService;
 	private final UserService userService;
+	private final CandidateService candidateService;
 	private final SecurityUtil securityUtil;
 	private final JobCandidateMatchService jobCandidateMatchService;
 	private final CandidateUtil candidateUtil;
@@ -48,8 +52,10 @@ public class JobController
 		model.addAttribute("job", job);
 		if (securityUtil.isCandidate())
 		{
+			final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
 			model.addAttribute("jobCandidateMatch",
-					jobCandidateMatchService.getJobMatchScore(job, candidateUtil.getAuthenticatedCandidate()));
+					jobCandidateMatchService.getJobMatchScore(job, candidate));
+			model.addAttribute("bookmark", candidate.getBookmarkedJobs().contains(job));
 		}
 		return "jobs/details";
 	}
@@ -113,6 +119,16 @@ public class JobController
 
 		jobService.deleteById(id);
 		return "redirect:/jobs";
+	}
+
+	@PreAuthorize("@securityUtil.isCandidate()")
+	@PostMapping("/bookmark/{id}")
+	public String bookmarkJob(@PathVariable final Long id, @RequestHeader("referer") final String referer)
+	{
+		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
+		final Job job = jobService.findById(id);
+		candidateService.toggleJobBookmark(candidate, job);
+		return "redirect:" + referer;
 	}
 
 	private String prepareJobForm(final JobForm jobForm, final Model model)

@@ -99,7 +99,7 @@ public class DefaultCandidateService implements CandidateService
 		                                            .map(Optional::get)
 		                                            .toList();
 		candidate.getCandidateProfile().setSkills(new HashSet<>(matchedSkills));
-
+		jobCandidateMatchService.delete(candidate);
 		return update(candidate);
 	}
 
@@ -136,6 +136,11 @@ public class DefaultCandidateService implements CandidateService
 	public void updateCandidateProfile(final Candidate candidate, final CandidateProfileEditingDto candidateProfileEditingDto)
 	{
 		final CandidateProfile currentCandidateProfile = candidate.getCandidateProfile();
+
+		candidate.setFirstName(candidateProfileEditingDto.getFirstName());
+		candidate.setLastName(candidateProfileEditingDto.getLastName());
+		candidate.setCvLink(candidateProfileEditingDto.getCvLink());
+
 		currentCandidateProfile.getJobExperiences().clear();
 		if (candidateProfileEditingDto.getJobExperienceList() != null)
 		{
