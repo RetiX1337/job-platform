@@ -5,12 +5,9 @@ import java.util.Set;
 
 import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.jobs.model.Job;
-import com.butenov.jobplatform.users.model.Recruiter;
+import com.butenov.jobplatform.recruiters.model.Recruiter;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

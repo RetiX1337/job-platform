@@ -1,6 +1,7 @@
-package com.butenov.jobplatform.users.model;
+package com.butenov.jobplatform.recruiters.model;
 
 import com.butenov.jobplatform.companies.model.Company;
+import com.butenov.jobplatform.users.model.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

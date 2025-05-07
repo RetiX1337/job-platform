@@ -1,0 +1,67 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Candidate Search</title>
+    <script>
+        function goToPage(pageNumber) {
+            document.getElementById("page").value = pageNumber;
+            document.getElementById("searchForm").submit();
+        }
+    </script>
+</head>
+<body>
+
+<form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get">
+    <!-- Location Filter -->
+    <input type="text" name="location" th:value="${criteria.location}" placeholder="Location" />
+
+    <!-- Skills Multi-Select -->
+    <select name="skillIds" multiple>
+        <option th:each="skill : ${allSkills}"
+                th:value="${skill.id}"
+                th:selected="${criteria.skillIds.contains(skill.id)}"
+                th:text="${skill.name}">
+        </option>
+    </select>
+
+    <!-- Hidden Job ID -->
+    <input type="hidden" name="jobId" th:value="${job.id}" />
+
+    <!-- Page tracking -->
+    <input type="hidden" id="page" name="page" th:value="${currentPage}" />
+    <button type="submit">Search</button>
+</form>
+
+<!-- Candidate List -->
+<div th:if="${#lists.isEmpty(candidatesPage.content)}">
+    <p>No candidates found.</p>
+</div>
+
+<div th:if="${not #lists.isEmpty(candidatesPage.content)}">
+    <ul>
+        <li th:each="candidateResult : ${candidatesPage.getContent()}">
+            <!--/*@thymesVar id="candidateResult" type="com.butenov.jobplatform.candidates.dto.CandidateIntellectualSearchResult"*/-->
+            <span th:text="${candidateResult.candidate.firstName}"></span> <span th:text="${candidateResult.candidate.lastName}"></span>  -
+<!--            <span th:text="${result.candidate.location}"></span>-->
+            <span>location placeholder</span>
+            <span th:text="${candidateResult.jobCandidateMatch.matchScore * 100} + '%'"></span>
+            <!-- Link to candidate profile if applicable -->
+            <a th:href="@{/candidates/{id}(id=${candidateResult.candidate.id})}">View Profile</a>
+        </li>
+    </ul>
+
+    <!-- Pagination Controls -->
+    <div>
+        <span>Page: </span>
+        <a href="#" th:if="${currentPage > 0}" th:onclick="|goToPage(${currentPage - 1})|">Previous</a> |
+        <span th:text="${currentPage + 1}"></span> |
+        <a href="#" th:if="${currentPage < totalPages - 1}" th:onclick="|goToPage(${currentPage + 1})|">Next</a>
+    </div>
+
+    <div>
+        <span th:text="'Total pages: ' + ${totalPages}"></span>
+        <span th:text="'Total candidates: ' + ${totalItems}"></span>
+    </div>
+</div>
+
+</body>
+</html>

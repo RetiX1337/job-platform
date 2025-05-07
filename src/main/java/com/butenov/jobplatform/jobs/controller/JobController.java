@@ -22,7 +22,7 @@ import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.service.JobService;
 import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.skills.service.SkillService;
-import com.butenov.jobplatform.users.model.Recruiter;
+import com.butenov.jobplatform.recruiters.model.Recruiter;
 import com.butenov.jobplatform.users.model.User;
 import com.butenov.jobplatform.users.service.UserService;
 
@@ -89,22 +89,20 @@ public class JobController
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@GetMapping("/edit/{id}")
-	public String showEditForm(@PathVariable final Long id, final Model model,
-	                           @AuthenticationPrincipal final UserDetails userDetails)
+	public String showEditForm(@PathVariable final Long id, final Model model)
 	{
 		final Job job = jobService.findById(id);
-		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, job);
+		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
 
 		return prepareJobForm(jobConverter.convertToDto(job), model);
 	}
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@PostMapping("/edit/{id}")
-	public String updateJob(@PathVariable final Long id, @ModelAttribute final JobForm jobForm, final Model model,
-	                        @AuthenticationPrincipal final UserDetails userDetails)
+	public String updateJob(@PathVariable final Long id, @ModelAttribute final JobForm jobForm, final Model model)
 	{
 		final Job existingJob = jobService.findById(id);
-		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, existingJob);
+		securityUtil.validateRecruiterAuthorizedToModifyJob(existingJob);
 
 		jobForm.setCompanyId(existingJob.getCompany().getId());
 		return saveJob(jobForm, model, true);
@@ -112,10 +110,10 @@ public class JobController
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@PostMapping("/delete/{id}")
-	public String deleteJob(@PathVariable final Long id, @AuthenticationPrincipal final UserDetails userDetails)
+	public String deleteJob(@PathVariable final Long id)
 	{
 		final Job job = jobService.findById(id);
-		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, job);
+		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
 
 		jobService.deleteById(id);
 		return "redirect:/jobs";

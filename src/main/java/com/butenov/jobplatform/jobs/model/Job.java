@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.companies.model.Company;
-import com.butenov.jobplatform.users.model.Recruiter;
+import com.butenov.jobplatform.recruiters.model.Recruiter;
 import com.butenov.jobplatform.skills.model.Skill;
 
 import jakarta.persistence.Entity;

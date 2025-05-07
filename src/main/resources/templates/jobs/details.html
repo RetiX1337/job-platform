@@ -23,6 +23,14 @@
     <p th:text="${jobCandidateMatch.intellectualAnalysisJustification}"></p>
 </div>
 
+<div th:if="${@securityUtil.isRecruiterAuthorizedToModifyJob(job)}">
+
+    <form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get">
+        <input type="hidden" name="jobId" th:value="${job.id}" />
+        <button type="submit">Search</button>
+    </form>
+</div>
+
 <div sec:authorize="@securityUtil.isCandidate()">
     <form th:if="${!@candidateUtil.hasAlreadyApplied(job)}" th:action="@{/applications/apply/__${id}__}" method="post">
         <input type="hidden" name="jobId" th:value="${job.id}"/>

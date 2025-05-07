@@ -5,7 +5,7 @@ import java.util.Set;
 import com.butenov.jobplatform.companies.model.Company;
 import com.butenov.jobplatform.companies.service.CompanyService;
 import com.butenov.jobplatform.security.dto.RecruiterRegistrationInfo;
-import com.butenov.jobplatform.users.model.Recruiter;
+import com.butenov.jobplatform.recruiters.model.Recruiter;
 import com.butenov.jobplatform.users.model.Role;
 import com.butenov.jobplatform.users.service.UserService;
 

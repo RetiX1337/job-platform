@@ -7,20 +7,20 @@ import org.springframework.stereotype.Component;
 
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.candidates.model.Candidate;
-import com.butenov.jobplatform.users.model.Recruiter;
+import com.butenov.jobplatform.recruiters.model.Recruiter;
+import com.butenov.jobplatform.recruiters.service.RecruiterUtil;
 import com.butenov.jobplatform.users.model.User;
 import com.butenov.jobplatform.users.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class SecurityUtil
 {
 
 	private final UserService userService;
-
-	public SecurityUtil(final UserService userService)
-	{
-		this.userService = userService;
-	}
+	private final RecruiterUtil recruiterUtil;
 
 	public boolean isRecruiter()
 	{
@@ -48,15 +48,19 @@ public class SecurityUtil
 		return false;
 	}
 
-	public boolean isRecruiterAuthorizedToModifyJob(final UserDetails userDetails, final Job job)
+	public boolean isRecruiterAuthorizedToModifyJob(final Job job)
 	{
-		final User user = userService.findByEmail(userDetails.getUsername());
-		return user instanceof final Recruiter recruiter && job.getCompany().equals(recruiter.getCompany());
+		if (isRecruiter())
+		{
+			final Recruiter recruiter = recruiterUtil.getAuthenticatedRecruiter();
+			return job.getCompany().equals(recruiter.getCompany());
+		}
+		return false;
 	}
 
-	public void validateRecruiterAuthorizedToModifyJob(final UserDetails userDetails, final Job job)
+	public void validateRecruiterAuthorizedToModifyJob(final Job job)
 	{
-		if (!isRecruiterAuthorizedToModifyJob(userDetails, job))
+		if (!isRecruiterAuthorizedToModifyJob(job))
 		{
 			throw new AccessDeniedException("You cannot modify this job.");
 		}

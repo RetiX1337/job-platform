@@ -3,8 +3,6 @@ package com.butenov.jobplatform.jobapplications.controller;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,12 +48,11 @@ public class JobApplicationController
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@GetMapping("/job/{jobId}")
-	public String viewApplications(@PathVariable final Long jobId, final Model model,
-	                               @AuthenticationPrincipal final UserDetails userDetails)
+	public String viewApplications(@PathVariable final Long jobId, final Model model)
 	{
 		final Job job = jobService.findById(jobId);
 
-		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, job);
+		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
 
 		final List<JobApplication> applications = jobApplicationService.findByJobId(jobId);
 		model.addAttribute("job", job);
@@ -76,12 +73,12 @@ public class JobApplicationController
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@PostMapping("/{applicationId}/accept")
-	public String acceptApplication(@PathVariable final Long applicationId, @AuthenticationPrincipal final UserDetails userDetails)
+	public String acceptApplication(@PathVariable final Long applicationId)
 	{
 		final JobApplication jobApplication = jobApplicationService.findById(applicationId);
 		final Job job = jobApplication.getJob();
 
-		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, job);
+		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
 
 		jobApplicationService.acceptApplication(jobApplication);
 		return "redirect:/applications/job/" + job.getId();
@@ -89,12 +86,12 @@ public class JobApplicationController
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@PostMapping("/{applicationId}/reject")
-	public String rejectApplication(@PathVariable final Long applicationId, @AuthenticationPrincipal final UserDetails userDetails)
+	public String rejectApplication(@PathVariable final Long applicationId)
 	{
 		final JobApplication jobApplication = jobApplicationService.findById(applicationId);
 		final Job job = jobApplication.getJob();
 
-		securityUtil.validateRecruiterAuthorizedToModifyJob(userDetails, job);
+		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
 
 		jobApplicationService.rejectApplication(jobApplication);
 		return "redirect:/applications/job/" + job.getId();
