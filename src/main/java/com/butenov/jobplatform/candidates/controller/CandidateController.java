@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,6 +50,7 @@ public class CandidateController
 	private final CandidateUtil candidateUtil;
 	private final JobService jobService;
 
+	@PreAuthorize("@securityUtil.isRecruiter()")
 	@GetMapping("/{id}")
 	public String viewProfile(final Model model, final @PathVariable Long id)
 	{
@@ -79,10 +81,16 @@ public class CandidateController
 			@ModelAttribute("candidateProfileEditingDto") final CandidateProfileEditingDto candidateProfileEditingDto)
 	{
 		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
+		if (candidateProfileEditingDto.getId().equals(candidate.getId()))
+		{
+			candidateService.updateCandidateProfile(candidate, candidateProfileEditingDto);
 
-		candidateService.updateCandidateProfile(candidate, candidateProfileEditingDto);
-
-		return "redirect:/candidates/" + candidate.getId();
+			return "redirect:/candidates/me";
+		}
+		else
+		{
+			throw new AccessDeniedException("You are not authorized to edit this profile.");
+		}
 	}
 
 	@PreAuthorize("@securityUtil.isCandidate()")

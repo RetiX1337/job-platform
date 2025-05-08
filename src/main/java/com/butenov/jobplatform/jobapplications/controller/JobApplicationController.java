@@ -61,7 +61,7 @@ public class JobApplicationController
 	}
 
 	@PreAuthorize("@securityUtil.isCandidate()")
-	@GetMapping("/")
+	@GetMapping
 	public String viewCandidateApplications(final Model model)
 	{
 		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();

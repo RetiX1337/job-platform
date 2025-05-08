@@ -1,0 +1,19 @@
+<header th:fragment="header">
+    <nav>
+        <div>
+            <a th:href="@{/}">JobMatch</a>
+        </div>
+
+        <form th:action="@{/jobs/search}" method="get">
+            <input type="text" name="query" placeholder="Search jobs...">
+            <button type="submit">Search</button>
+        </form>
+
+        <ul>
+            <li><a th:href="@{/candidates/bookmarks}">Bookmarks</a></li>
+            <li><a th:href="@{/applications}">Applications</a></li>
+            <li><a th:href="@{/candidates/me}">Profile</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</header>

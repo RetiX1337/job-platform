@@ -5,6 +5,9 @@
     <title>Job List</title>
 </head>
 <body>
+<div sec:authorize="@securityUtil.isCandidate()">
+    <div th:replace="fragments/candidate-header :: header"></div>
+</div>
 <h1>Job List</h1>
 <a sec:authorize="@securityUtil.isRecruiter()" href="/jobs/create">Create New Job</a>
 <table border="1">
