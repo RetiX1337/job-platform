@@ -12,6 +12,9 @@
 <div sec:authorize="@securityUtil.isCandidate()">
     <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
+<div sec:authorize="@securityUtil.isRecruiter()">
+    <div th:replace="~{fragments/recruiter-header :: header}"></div>
+</div>
 
 <form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get">
     <!-- Location Filter -->

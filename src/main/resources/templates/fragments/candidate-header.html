@@ -5,8 +5,11 @@
         </div>
 
         <form th:action="@{/jobs/search}" method="get">
-            <input type="text" name="query" placeholder="Search jobs...">
             <button type="submit">Search</button>
+        </form>
+
+        <form th:action="@{/jobs/search-intellectual}" method="get">
+            <button type="submit">AI Search</button>
         </form>
 
         <ul>

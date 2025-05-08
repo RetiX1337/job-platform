@@ -2,6 +2,8 @@ package com.butenov.jobplatform.jobapplications.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.butenov.jobplatform.jobapplications.model.JobApplication;
@@ -9,6 +11,7 @@ import com.butenov.jobplatform.jobapplications.repository.JobApplicationReposito
 import com.butenov.jobplatform.jobapplications.service.JobApplicationService;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.candidates.model.Candidate;
+import com.butenov.jobplatform.recruiters.model.Recruiter;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -95,4 +98,11 @@ public class DefaultJobApplicationService implements JobApplicationService
 	{
 		return jobApplicationRepository.existsByJobAndCandidate(job, candidate);
 	}
+
+	@Override
+	public Page<JobApplication> findLatestApplicationsForRecruiter(final Recruiter recruiter, final Pageable pageable)
+	{
+		return jobApplicationRepository.findByCompanyOrderByCreatedAtDesc(recruiter.getCompany(), pageable);
+	}
+
 }

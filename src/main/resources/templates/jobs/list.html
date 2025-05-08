@@ -8,6 +8,9 @@
 <div sec:authorize="@securityUtil.isCandidate()">
     <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
+<div sec:authorize="@securityUtil.isRecruiter()">
+    <div th:replace="~{fragments/recruiter-header :: header}"></div>
+</div>
 <h1>Job List</h1>
 <a sec:authorize="@securityUtil.isRecruiter()" href="/jobs/create">Create New Job</a>
 <table border="1">
@@ -22,7 +25,7 @@
         <td>
             <a th:href="@{/jobs/edit/__${job.id}__}">Edit</a>
             <a th:href="@{/jobs/__${job.id}__}">Show</a>
-            <form sec:authorize="hasAuthority('ROLE_RECRUITER')" th:action="@{/jobs/delete/{id}(id=${job.id})}"
+            <form sec:authorize="@securityUtil.isRecruiter()" th:action="@{/jobs/delete/{id}(id=${job.id})}"
                   method="post" style="display:inline;">
                 <button type="submit">Delete</button>
             </form>

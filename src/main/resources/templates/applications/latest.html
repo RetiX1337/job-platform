@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Latest Applications</title>
+</head>
+<body>
+<div sec:authorize="@securityUtil.isCandidate()">
+    <div th:replace="~{fragments/candidate-header :: header}"></div>
+</div>
+<div sec:authorize="@securityUtil.isRecruiter()">
+    <div th:replace="~{fragments/recruiter-header :: header}"></div>
+</div>
+<h1>Latest Applications</h1>
+
+<ul>
+    <li th:each="app : ${applications.getContent()}">
+        <!--/*@thymesVar id="app" type="com.butenov.jobplatform.jobapplications.model.JobApplication"*/-->
+        <strong th:text="${app.candidate.firstName + ' ' + app.candidate.lastName}"></strong>
+        applied for
+        <span th:text="${app.job.title}"></span>
+        on
+        <span th:text="${#dates.format(app.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+    </li>
+</ul>
+
+<div>
+    <span th:text="'Page ' + ${applications.number + 1} + ' of ' + ${applications.totalPages}"></span>
+
+    <div>
+        <a th:if="${applications.hasPrevious()}"
+           th:href="@{/applications/latest(page=${applications.number - 1}, size=${applications.size})}">
+            Previous
+        </a>
+
+        <a th:if="${applications.hasNext()}"
+           th:href="@{/applications/latest(page=${applications.number + 1}, size=${applications.size})}">
+            Next
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

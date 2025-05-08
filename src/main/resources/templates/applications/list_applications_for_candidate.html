@@ -8,6 +8,9 @@
 <div sec:authorize="@securityUtil.isCandidate()">
     <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
+<div sec:authorize="@securityUtil.isRecruiter()">
+    <div th:replace="~{fragments/recruiter-header :: header}"></div>
+</div>
 
 <h1>My Job Applications</h1>
 

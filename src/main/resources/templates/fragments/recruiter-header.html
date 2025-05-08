@@ -1,0 +1,14 @@
+<header th:fragment="header">
+    <nav>
+        <div>
+            <a th:href="@{/}">JobMatch</a>
+        </div>
+
+        <ul>
+            <li><a th:href="@{/jobs}">Jobs</a></li>
+            <li><a th:href="@{/company}">My Company</a></li>
+            <li><a th:href="@{/applications/latest}">Latest Applications</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</header>

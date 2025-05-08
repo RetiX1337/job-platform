@@ -21,6 +21,7 @@ import com.butenov.jobplatform.jobs.dto.JobForm;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.service.JobService;
 import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
+import com.butenov.jobplatform.recruiters.service.RecruiterUtil;
 import com.butenov.jobplatform.skills.service.SkillService;
 import com.butenov.jobplatform.recruiters.model.Recruiter;
 import com.butenov.jobplatform.users.model.User;
@@ -43,6 +44,7 @@ public class JobController
 	private final SecurityUtil securityUtil;
 	private final JobCandidateMatchService jobCandidateMatchService;
 	private final CandidateUtil candidateUtil;
+	private final RecruiterUtil recruiterUtil;
 
 	@GetMapping("/{id}")
 	public String showJob(@PathVariable final Long id, final Model model)
@@ -60,10 +62,12 @@ public class JobController
 		return "jobs/details";
 	}
 
+	@PreAuthorize("@securityUtil.isRecruiter()")
 	@GetMapping
 	public String listJobs(final Model model)
 	{
-		model.addAttribute("jobs", jobService.findAll());
+		final Recruiter recruiter = recruiterUtil.getAuthenticatedRecruiter();
+		model.addAttribute("jobs", jobService.findAllByCompany(recruiter.getCompany()));
 		return "jobs/list";
 	}
 

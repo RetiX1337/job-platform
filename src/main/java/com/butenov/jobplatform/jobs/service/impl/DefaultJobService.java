@@ -2,8 +2,11 @@ package com.butenov.jobplatform.jobs.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.butenov.jobplatform.companies.model.Company;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.repository.JobRepository;
 import com.butenov.jobplatform.jobs.service.JobService;
@@ -36,6 +39,12 @@ public class DefaultJobService implements JobService
 	}
 
 	@Override
+	public List<Job> findAllByCompany(final Company company)
+	{
+		return jobRepository.findAllByCompany(company);
+	}
+
+	@Override
 	public List<Job> findAll()
 	{
 		return jobRepository.findAll();
@@ -59,5 +68,11 @@ public class DefaultJobService implements JobService
 			return jobRepository.save(job);
 		}
 		throw new EntityNotFoundException(ENTITY_NOT_FOUND_EXCEPTION.formatted(id));
+	}
+
+	@Override
+	public Page<Job> findLatestJobsForCompany(final Company company, final Pageable pageable)
+	{
+		return jobRepository.findByCompanyOrderByCreatedAtDesc(company, pageable);
 	}
 }
