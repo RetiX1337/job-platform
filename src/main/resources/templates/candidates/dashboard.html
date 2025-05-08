@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Candidate Dashboard</title>
 </head>
 <body>
+<div th:replace="~{fragments/candidate-header :: header}"></div>
 
+<h1>Welcome, <span th:text="${candidate.firstName}"/>!</h1>
+
+<section>
+    <h2>Your Profile</h2>
+    <div th:if="${profile != null}">
+        <div th:unless="${profile.skills.isEmpty()}">
+            <p>Skills:</p>
+            <ul>
+                <li th:each="skill : ${profile.skills}" th:text="${skill.name}"></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Bookmarked Jobs</h2>
+    <ul>
+        <li th:each="job : ${bookmarks}">
+            <a th:href="@{'/jobs/' + ${job.id}}" th:text="${job.title}"></a>
+        </li>
+    </ul>
+    <a th:href="@{/candidates/bookmarks}">See all</a>
+</section>
+
+<section>
+    <h2>Your Applications</h2>
+    <ul>
+        <li th:each="app : ${applications}">
+            <span th:text="${app.job.title}"></span> –
+            <span th:text="${app.status}"></span>
+        </li>
+    </ul>
+    <a th:href="@{/applications}">See all</a>
+</section>
+
+<section>
+    <h2>Suggested Jobs</h2>
+    <ul>
+        <li th:each="suggestedJob : ${suggestedJobs}">
+            <a th:href="@{'/jobs/' + ${suggestedJob.job.id}}" th:text="${suggestedJob.job.title} + ' Match score: ' + ${suggestedJob.jobCandidateMatch.matchScore * 100} + '%'"></a>
+        </li>
+    </ul>
+    <a th:href="@{/jobs/search-intellectual}">See all</a>
+</section>
 </body>
 </html>

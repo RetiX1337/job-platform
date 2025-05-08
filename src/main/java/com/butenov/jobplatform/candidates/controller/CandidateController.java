@@ -48,7 +48,6 @@ public class CandidateController
 	private final CandidateService candidateService;
 	private final SkillService skillService;
 	private final CandidateUtil candidateUtil;
-	private final JobService jobService;
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@GetMapping("/{id}")

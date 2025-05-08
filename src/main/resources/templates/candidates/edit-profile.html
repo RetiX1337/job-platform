@@ -93,7 +93,7 @@
 </head>
 <body>
 <div sec:authorize="@securityUtil.isCandidate()">
-    <div th:replace="fragments/candidate-header :: header"></div>
+    <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
 <h1>Edit Profile</h1>
 
