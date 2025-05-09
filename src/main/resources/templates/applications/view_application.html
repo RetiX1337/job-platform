@@ -25,6 +25,8 @@
 <p th:text="${jobApplication.feedback != null ? jobApplication.feedback : 'No feedback yet.'}"></p>
 
 <div sec:authorize="@securityUtil.isRecruiter()">
+    <h2>Candidate's Contact Information</h2>
+    <p><strong>Email:</strong> <span th:text="${jobApplication.candidate.email}"></span></p>
     <form th:action="@{'/applications/' + ${jobApplication.id} + '/update'}" method="post">
         <label for="status">Update Status:</label>
         <select name="status" id="status">
