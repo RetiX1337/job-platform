@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import com.butenov.jobplatform.jobs.service.JobService;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.recruiters.model.Recruiter;
 import com.butenov.jobplatform.recruiters.service.RecruiterUtil;
+import com.butenov.jobplatform.users.model.User;
 
 import lombok.AllArgsConstructor;
 
@@ -76,32 +78,6 @@ public class JobApplicationController
 		return "applications/list_applications_for_candidate";
 	}
 
-	@PreAuthorize("@securityUtil.isRecruiter()")
-	@PostMapping("/{applicationId}/accept")
-	public String acceptApplication(@PathVariable final Long applicationId)
-	{
-		final JobApplication jobApplication = jobApplicationService.findById(applicationId);
-		final Job job = jobApplication.getJob();
-
-		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
-
-		jobApplicationService.acceptApplication(jobApplication);
-		return "redirect:/applications/job/" + job.getId();
-	}
-
-	@PreAuthorize("@securityUtil.isRecruiter()")
-	@PostMapping("/{applicationId}/reject")
-	public String rejectApplication(@PathVariable final Long applicationId)
-	{
-		final JobApplication jobApplication = jobApplicationService.findById(applicationId);
-		final Job job = jobApplication.getJob();
-
-		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
-
-		jobApplicationService.rejectApplication(jobApplication);
-		return "redirect:/applications/job/" + job.getId();
-	}
-
 	@GetMapping("/latest")
 	public String getLatestApplications(final @RequestParam(defaultValue = "0") int page,
 	                                    final @RequestParam(defaultValue = "10") int size,
@@ -117,5 +93,42 @@ public class JobApplicationController
 		return "applications/latest";
 	}
 
-}
+	@PreAuthorize("@securityUtil.isCandidate() or @securityUtil.isRecruiter()")
+	@GetMapping("/{applicationId}")
+	public String viewApplicationDetails(@PathVariable final Long applicationId, final Model model)
+	{
+		final JobApplication application = jobApplicationService.findById(applicationId);
+		final User user = securityUtil.getAuthenticatedUser();
 
+		if (user instanceof Recruiter)
+		{
+			securityUtil.validateRecruiterAuthorizedToModifyJob(application.getJob());
+		}
+		else if (user instanceof final Candidate candidate && !application.getCandidate().getId().equals(candidate.getId()))
+		{
+			throw new AccessDeniedException("You are not authorized to view this application.");
+		}
+
+		model.addAttribute("statuses", JobApplication.Status.values());
+		model.addAttribute("jobApplication", application);
+		return "applications/view_application";
+	}
+
+	@PreAuthorize("@securityUtil.isRecruiter()")
+	@PostMapping("/{applicationId}/update")
+	public String updateApplication(@PathVariable final Long applicationId,
+	                                @RequestParam final String status,
+	                                @RequestParam final String feedback)
+	{
+		final JobApplication application = jobApplicationService.findById(applicationId);
+		final Job job = application.getJob();
+
+		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
+
+		application.setStatus(JobApplication.Status.valueOf(status));
+		application.setFeedback(feedback);
+		jobApplicationService.save(application);
+
+		return "redirect:/applications/" + applicationId;
+	}
+}

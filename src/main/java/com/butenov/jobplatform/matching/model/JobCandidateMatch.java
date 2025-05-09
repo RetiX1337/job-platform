@@ -1,5 +1,8 @@
 package com.butenov.jobplatform.matching.model;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.jobs.model.Job;
@@ -23,11 +26,13 @@ import lombok.Setter;
 public class JobCandidateMatch extends BaseEntity
 {
 	@ManyToOne
-	@JoinColumn(name = "job_id")
+	@JoinColumn(name = "job_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Job job;
 
 	@ManyToOne
-	@JoinColumn(name = "candidate_id")
+	@JoinColumn(name = "candidate_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Candidate candidate;
 
 	private Double matchScore;

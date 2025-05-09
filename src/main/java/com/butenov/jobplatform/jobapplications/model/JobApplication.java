@@ -1,15 +1,13 @@
 package com.butenov.jobplatform.jobapplications.model;
 
+import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.commons.model.BaseEntity;
 import com.butenov.jobplatform.jobs.model.Job;
-import com.butenov.jobplatform.candidates.model.Candidate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -29,8 +27,6 @@ public class JobApplication extends BaseEntity
 	@Enumerated(EnumType.STRING)
 	private Status status;
 
-	private Double likelihood;
-
 	@ManyToOne
 	@JoinColumn(name = "candidate_id")
 	private Candidate candidate;
@@ -39,8 +35,15 @@ public class JobApplication extends BaseEntity
 	@JoinColumn(name = "job_id")
 	private Job job;
 
+	@Column(columnDefinition = "TEXT")
+	private String feedback;
+
 	public enum Status
 	{
-		PENDING, ACCEPTED, REJECTED
+		SUBMITTED,
+		IN_REVIEW,
+		INTERVIEW,
+		OFFERED,
+		REJECTED
 	}
 }

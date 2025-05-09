@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Application Details</title>
+</head>
+<body>
+<div sec:authorize="@securityUtil.isCandidate()">
+    <div th:replace="~{fragments/candidate-header :: header}"></div>
+</div>
+<div sec:authorize="@securityUtil.isRecruiter()">
+    <div th:replace="~{fragments/recruiter-header :: header}"></div>
+</div>
+
+<h1>Application Details</h1>
+
+<p><strong>Job:</strong> <a th:href="@{'/jobs/' + ${jobApplication.job.id}}"
+                            th:text="${jobApplication.job.title}"></a></p>
+
+<p><strong>Candidate:</strong> <span
+        th:text="${jobApplication.candidate.firstName + ' ' + jobApplication.candidate.lastName}"></span></p>
+
+<p><strong>Status:</strong> <span th:text="${jobApplication.status}"></span></p>
+
+<p><strong>Feedback:</strong></p>
+<p th:text="${jobApplication.feedback != null ? jobApplication.feedback : 'No feedback yet.'}"></p>
+
+<div sec:authorize="@securityUtil.isRecruiter()">
+    <form th:action="@{'/applications/' + ${jobApplication.id} + '/update'}" method="post">
+        <label for="status">Update Status:</label>
+        <select name="status" id="status">
+            <option th:each="status : ${statuses}"
+                    th:value="${status}"
+                    th:text="${status}"></option>
+        </select>
+
+        <br><br>
+
+        <label for="feedback">Feedback:</label><br>
+        <textarea name="feedback" id="feedback" rows="4" cols="50" th:text="${jobApplication.feedback}"></textarea>
+
+        <br><br>
+        <button type="submit">Update Application</button>
+    </form>
+</div>
+
+</body>
+</html>

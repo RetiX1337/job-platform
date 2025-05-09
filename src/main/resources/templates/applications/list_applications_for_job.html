@@ -20,7 +20,7 @@
         <th>Candidate</th>
         <th>Job Title</th>
         <th>Status</th>
-        <th>Actions</th>
+        <th>Details</th>
     </tr>
     </thead>
     <tbody>
@@ -28,14 +28,8 @@
         <td th:text="${jobApplication.candidate.firstName + ' ' + jobApplication.candidate.lastName}"></td>
         <td th:text="${jobApplication.job.title}"></td>
         <td th:text="${jobApplication.status}"></td>
-
         <td>
-            <form th:action="@{/applications/{id}/accept(id=${jobApplication.id})}" method="post" style="display:inline;">
-                <button type="submit">Accept</button>
-            </form>
-            <form th:action="@{/applications/{id}/reject(id=${jobApplication.id})}" method="post" style="display:inline;">
-                <button type="submit" class="danger">Reject</button>
-            </form>
+            <a th:href="@{'/applications/' + ${jobApplication.id}}">View</a>
         </td>
     </tr>
     </tbody>

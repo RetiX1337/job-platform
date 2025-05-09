@@ -42,7 +42,7 @@ public class DefaultJobApplicationService implements JobApplicationService
 		final JobApplication application = new JobApplication();
 		application.setCandidate(candidate);
 		application.setJob(job);
-		application.setStatus(JobApplication.Status.PENDING);
+		application.setStatus(JobApplication.Status.SUBMITTED);
 
 		save(application);
 	}
@@ -65,20 +65,6 @@ public class DefaultJobApplicationService implements JobApplicationService
 	public List<JobApplication> findByJobId(final Long jobId)
 	{
 		return jobApplicationRepository.findByJobId(jobId);
-	}
-
-	@Override
-	public void acceptApplication(final JobApplication jobApplication)
-	{
-		jobApplication.setStatus(JobApplication.Status.ACCEPTED);
-		save(jobApplication);
-	}
-
-	@Override
-	public void rejectApplication(final JobApplication jobApplication)
-	{
-		jobApplication.setStatus(JobApplication.Status.REJECTED);
-		save(jobApplication);
 	}
 
 	@Override

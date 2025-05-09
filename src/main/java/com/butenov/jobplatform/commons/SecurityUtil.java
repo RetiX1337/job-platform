@@ -1,6 +1,7 @@
 package com.butenov.jobplatform.commons;
 
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -64,6 +65,13 @@ public class SecurityUtil
 		{
 			throw new AccessDeniedException("You cannot modify this job.");
 		}
+	}
+
+	public User getAuthenticatedUser()
+	{
+		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		return userService.findByEmail(userDetails.getUsername());
 	}
 }
 
