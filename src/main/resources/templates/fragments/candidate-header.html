@@ -1,22 +1,28 @@
 <header th:fragment="header">
-    <nav>
-        <div>
-            <a th:href="@{/}">JobMatch</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">JobMatch</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <form th:action="@{/jobs/search}" method="get" class="d-inline">
+                            <button type="submit" class="btn btn-link nav-link">Search</button>
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/jobs/search-intellectual}" method="get" class="d-inline">
+                            <button type="submit" class="btn btn-link nav-link">AI Search</button>
+                        </form>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/candidates/me}">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/logout}">Logout</a></li>
+                </ul>
+            </div>
         </div>
-
-        <form th:action="@{/jobs/search}" method="get">
-            <button type="submit">Search</button>
-        </form>
-
-        <form th:action="@{/jobs/search-intellectual}" method="get">
-            <button type="submit">AI Search</button>
-        </form>
-
-        <ul>
-            <li><a th:href="@{/candidates/bookmarks}">Bookmarks</a></li>
-            <li><a th:href="@{/applications}">Applications</a></li>
-            <li><a th:href="@{/candidates/me}">Profile</a></li>
-            <li><a th:href="@{/logout}">Logout</a></li>
-        </ul>
     </nav>
 </header>

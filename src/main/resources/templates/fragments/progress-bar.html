@@ -1,0 +1,9 @@
+<div th:fragment="progressBar(score)">
+    <div class="progress">
+        <div class="progress-bar" role="progressbar"
+             th:style="|width: ${score * 100}%|"
+             th:classappend="${score >= 0.8} ? ' bg-success' : (${score >= 0.5} ? ' bg-warning' : ' bg-danger')"
+             th:text="|${#numbers.formatDecimal(score * 100, 1, 0)}%|">
+        </div>
+    </div>
+</div>

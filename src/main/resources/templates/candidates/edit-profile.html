@@ -2,33 +2,48 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Edit Profile</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
+
     <script>
         function addJobExperience() {
             let container = document.getElementById("jobExperienceContainer");
             let newIndex = container.children.length;
             let newEntry = document.createElement("div");
+            newEntry.classList.add("mb-3");
 
             newEntry.innerHTML = `
-                <label>Job Title:</label>
-                <input type="text" name="jobExperienceList[${newIndex}].jobTitle" required />
-
-                <label>Company Name:</label>
-                <input type="text" name="jobExperienceList[${newIndex}].companyName" required />
-
-                <label>Start Date:</label>
-                <input type="date" name="jobExperienceList[${newIndex}].startDate" required />
-
-                <label>End Date:</label>
-                <input type="date" name="jobExperienceList[${newIndex}].endDate" />
-
-                <label>Location:</label>
-                <input type="text" name="jobExperienceList[${newIndex}].location" />
-
-                <label>Description:</label>
-                <input type="text" name="jobExperienceList[${newIndex}].description" />
-
-                <button type="button" onclick="removeElement(this)">Remove</button>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Job Title:</label>
+                        <input type="text" class="form-control" name="jobExperienceList[${newIndex}].jobTitle" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Company Name:</label>
+                        <input type="text" class="form-control" name="jobExperienceList[${newIndex}].companyName" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Start Date:</label>
+                        <input type="date" class="form-control" name="jobExperienceList[${newIndex}].startDate" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">End Date:</label>
+                        <input type="date" class="form-control" name="jobExperienceList[${newIndex}].endDate" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Location:</label>
+                        <input type="text" class="form-control" name="jobExperienceList[${newIndex}].location" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Description:</label>
+                        <input type="text" class="form-control" name="jobExperienceList[${newIndex}].description" />
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger mt-2" onclick="removeElement(this)">Remove</button>
             `;
             container.appendChild(newEntry);
         }
@@ -37,27 +52,36 @@
             let container = document.getElementById("educationContainer");
             let newIndex = container.children.length;
             let newEntry = document.createElement("div");
+            newEntry.classList.add("mb-3");
 
             newEntry.innerHTML = `
-                <label>Degree:</label>
-                <input type="text" name="educationList[${newIndex}].degree" required />
-
-                <label>School Name:</label>
-                <input type="text" name="educationList[${newIndex}].schoolName" required />
-
-                <label>Field of Study:</label>
-                <input type="text" name="educationList[${newIndex}].fieldOfStudy" />
-
-                <label>Start Date:</label>
-                <input type="date" name="educationList[${newIndex}].startDate" required />
-
-                <label>End Date:</label>
-                <input type="date" name="educationList[${newIndex}].endDate" />
-
-                <label>Description:</label>
-                <input type="text" name="educationList[${newIndex}].description" />
-
-                <button type="button" onclick="removeElement(this)">Remove</button>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Degree:</label>
+                        <input type="text" class="form-control" name="educationList[${newIndex}].degree" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">School Name:</label>
+                        <input type="text" class="form-control" name="educationList[${newIndex}].schoolName" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Field of Study:</label>
+                        <input type="text" class="form-control" name="educationList[${newIndex}].fieldOfStudy" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Start Date:</label>
+                        <input type="date" class="form-control" name="educationList[${newIndex}].startDate" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">End Date:</label>
+                        <input type="date" class="form-control" name="educationList[${newIndex}].endDate" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Description:</label>
+                        <input type="text" class="form-control" name="educationList[${newIndex}].description" />
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger mt-2" onclick="removeElement(this)">Remove</button>
             `;
             container.appendChild(newEntry);
         }
@@ -89,6 +113,14 @@
                     document.getElementById("uploadStatus").innerText = "Upload failed: " + error;
                 });
         }
+
+        $(document).ready(function () {
+            $('#skills').select2({
+                placeholder: 'Select skills...',
+                allowClear: true,
+                width: '100%'
+            });
+        });
     </script>
 </head>
 <body>
@@ -98,91 +130,144 @@
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
-<h1>Edit Profile</h1>
+<div class="dashboard-container">
 
-<form th:action="@{/candidates/edit}" th:object="${candidateProfileEditingDto}" method="post">
-    <label>First Name:</label>
-    <input type="text" th:field="*{firstName}" required />
+    <div th:replace="~{fragments/sidebar}"></div>
 
-    <label>Last Name:</label>
-    <input type="text" th:field="*{lastName}" required />
+    <div class="container mt-4">
+        <h1 class="mb-4">Edit Profile</h1>
 
-    <label>Upload CV:</label>
-    <input type="file" id="cvFile" name="cvFile" accept=".pdf" />
-    <button type="button" onclick="uploadCV()">Upload</button>
+        <form th:action="@{/candidates/edit}" th:object="${candidateProfileEditingDto}" method="post">
+            <div class="mb-3">
+                <label class="form-label">First Name:</label>
+                <input type="text" class="form-control" th:field="*{firstName}" required/>
+            </div>
 
-    <p id="uploadStatus"></p>
+            <div class="mb-3">
+                <label class="form-label">Last Name:</label>
+                <input type="text" class="form-control" th:field="*{lastName}" required/>
+            </div>
 
-    <label for="skills">Skills</label>
-    <select name="skillIds" id="skills" th:field="*{skillIds}" multiple>
-        <option th:each="skill : ${skills}"
-                th:value="${skill.id}"
-                th:text="${skill.name}"></option>
-    </select>
+            <div class="mb-3">
+                <label class="form-label">Upload CV:</label>
+                <input type="file" class="form-control" id="cvFile" name="cvFile" accept=".pdf"/>
+                <button type="button" class="btn btn-primary mt-2" onclick="uploadCV()">Upload</button>
+                <p id="uploadStatus" class="mt-2"></p>
+            </div>
 
-    <h2>Job Experience</h2>
-    <div id="jobExperienceContainer">
-        <div th:each="jobExperience, iterStat : ${candidateProfileEditingDto.getJobExperienceList()}">
-            <label>Job Title:</label>
-            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].jobTitle'" th:value="${jobExperience.jobTitle}" required />
+            <div class="mb-3">
+                <label class="form-label" for="skills">Skills</label>
+                <select class="form-select" id="skills" name="skillIds" multiple="multiple" th:field="*{skillIds}">
+                    <option th:each="skill : ${skills}" th:value="${skill.id}" th:text="${skill.name}"></option>
+                </select>
+            </div>
 
-            <label>Company Name:</label>
-            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].companyName'" th:value="${jobExperience.companyName}" required />
+            <h2 class="mt-4">Job Experience</h2>
+            <div id="jobExperienceContainer" class="mb-3">
+                <div th:each="jobExperience, iterStat : ${candidateProfileEditingDto.getJobExperienceList()}"
+                     class="mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Job Title:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='jobExperienceList[' + ${iterStat.index} + '].jobTitle'"
+                                   th:value="${jobExperience.jobTitle}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Name:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='jobExperienceList[' + ${iterStat.index} + '].companyName'"
+                                   th:value="${jobExperience.companyName}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date:</label>
+                            <input type="date" class="form-control"
+                                   th:attr="name='jobExperienceList[' + ${iterStat.index} + '].startDate'"
+                                   th:value="${jobExperience.startDate}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Date:</label>
+                            <input type="date" class="form-control"
+                                   th:attr="name='jobExperienceList[' + ${iterStat.index} + '].endDate'"
+                                   th:value="${jobExperience.endDate}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Location:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='jobExperienceList[' + ${iterStat.index} + '].location'"
+                                   th:value="${jobExperience.location}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Description:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='jobExperienceList[' + ${iterStat.index} + '].description'"
+                                   th:value="${jobExperience.description}"/>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-danger mt-2" onclick="removeElement(this)">Remove</button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addJobExperience()">Add Job Experience</button>
 
-            <label>Start Date:</label>
-            <input type="date" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].startDate'" th:value="${jobExperience.startDate}" required />
+            <h2 class="mt-4">Education</h2>
+            <div id="educationContainer" class="mb-3">
+                <div th:each="education, iterStat : ${candidateProfileEditingDto.getEducationList()}" class="mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Degree:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='educationList[' + ${iterStat.index} + '].degree'"
+                                   th:value="${education.degree}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">School Name:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='educationList[' + ${iterStat.index} + '].schoolName'"
+                                   th:value="${education.schoolName}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Field of Study:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='educationList[' + ${iterStat.index} + '].fieldOfStudy'"
+                                   th:value="${education.fieldOfStudy}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date:</label>
+                            <input type="date" class="form-control"
+                                   th:attr="name='educationList[' + ${iterStat.index} + '].startDate'"
+                                   th:value="${education.startDate}" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Date:</label>
+                            <input type="date" class="form-control"
+                                   th:attr="name='educationList[' + ${iterStat.index} + '].endDate'"
+                                   th:value="${education.endDate}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Description:</label>
+                            <input type="text" class="form-control"
+                                   th:attr="name='educationList[' + ${iterStat.index} + '].description'"
+                                   th:value="${education.description}"/>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-danger mt-2" onclick="removeElement(this)">Remove</button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addEducation()">Add Education</button>
 
-            <label>End Date:</label>
-            <input type="date" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].endDate'" th:value="${jobExperience.endDate}" />
+            <button type="submit" class="btn btn-success mt-4">Save</button>
+        </form>
 
-            <label>Location:</label>
-            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].location'" th:value="${jobExperience.location}" />
+        <form th:action="@{/candidates/update-from-cv}" method="post" class="mt-3">
+            <button type="submit" class="btn btn-secondary">Retrieve Data from CV</button>
+        </form>
 
-            <label>Description:</label>
-            <input type="text" th:attr="name='jobExperienceList[' + ${iterStat.index} + '].description'" th:value="${jobExperience.description}" />
-
-            <button type="button" onclick="removeElement(this)">Remove</button>
+        <div th:if="${error != null}" class="alert alert-danger mt-3">
+            <p th:text="${error}"></p>
         </div>
+
+        <a th:href="@{/candidates/__${candidateProfileEditingDto.id}__}" class="btn btn-link mt-3">Back to Profile</a>
     </div>
-    <button type="button" onclick="addJobExperience()">Add Job Experience</button>
-
-    <h2>Education</h2>
-    <div id="educationContainer">
-        <div th:each="education, iterStat : ${candidateProfileEditingDto.getEducationList()}">
-            <label>Degree:</label>
-            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].degree'" th:value="${education.degree}" required />
-
-            <label>School Name:</label>
-            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].schoolName'" th:value="${education.schoolName}" required />
-
-            <label>Field of Study:</label>
-            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].fieldOfStudy'" th:value="${education.fieldOfStudy}" />
-
-            <label>Start Date:</label>
-            <input type="date" th:attr="name='educationList[' + ${iterStat.index} + '].startDate'" th:value="${education.startDate}" required />
-
-            <label>End Date:</label>
-            <input type="date" th:attr="name='educationList[' + ${iterStat.index} + '].endDate'" th:value="${education.endDate}" />
-
-            <label>Description:</label>
-            <input type="text" th:attr="name='educationList[' + ${iterStat.index} + '].description'" th:value="${education.description}" />
-
-            <button type="button" onclick="removeElement(this)">Remove</button>
-        </div>
-    </div>
-    <button type="button" onclick="addEducation()">Add Education</button>
-
-    <button type="submit">Save</button>
-</form>
-
-<form th:action="@{/candidates/update-from-cv}" method="post">
-    <button type="submit">Retrieve Data from CV</button>
-</form>
-
-<div th:if="${error != null}" class="error-message">
-    <p th:text="${error}"></p>
 </div>
-
-<a th:href="@{/candidates/__${candidateProfileEditingDto.id}__}">Back to Profile</a>
 </body>
 </html>

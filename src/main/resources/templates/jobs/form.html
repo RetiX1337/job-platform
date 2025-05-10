@@ -2,6 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title th:text="${jobForm.id == null ? 'Create Job' : 'Edit Job'}">Job Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div sec:authorize="@securityUtil.isCandidate()">
@@ -10,50 +13,77 @@
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
+<div class="dashboard-container">
 
-<h2 th:text="${jobForm.id == null ? 'Create Job' : 'Edit Job'}"></h2>
+    <div th:replace="~{fragments/sidebar}"></div>
 
-<!-- Error message display -->
-<div th:if="${error}" style="color: red;">
-    <p th:text="${error}"></p>
+    <div class="container mt-4">
+        <h2 class="mb-4" th:text="${jobForm.id == null ? 'Create Job' : 'Edit Job'}"></h2>
+
+        <!-- Error message display -->
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Job Form -->
+        <form th:action="${jobForm.id == null} ? '/jobs/create' : '/jobs/edit/' + ${jobForm.id}"
+              th:object="${jobForm}" method="post" class="needs-validation" novalidate>
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label>
+                <input id="title" type="text" th:field="*{title}" class="form-control" required/>
+                <div class="invalid-feedback">Please provide a title.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <textarea id="description" th:field="*{description}" class="form-control" rows="4" required></textarea>
+                <div class="invalid-feedback">Please provide a description.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="location" class="form-label">Location:</label>
+                <input id="location" type="text" th:field="*{location}" class="form-control" required/>
+                <div class="invalid-feedback">Please provide a location.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="requirements" class="form-label">Requirements:</label>
+                <textarea id="requirements" th:field="*{requirements}" class="form-control" rows="4"
+                          required></textarea>
+                <div class="invalid-feedback">Please provide the requirements.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="skills" class="form-label">Required Skills:</label>
+                <select id="skills" th:field="*{requiredSkillIds}" class="form-select" multiple>
+                    <option th:each="skill : ${skills}"
+                            th:value="${skill.id}"
+                            th:text="${skill.name}"></option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="/jobs" class="btn btn-secondary">Back to Job List</a>
+        </form>
+    </div>
 </div>
 
-<!-- Job Form -->
-<form th:action="${jobForm.id == null} ? '/jobs/create' : '/jobs/edit/' + ${jobForm.id}"
-      th:object="${jobForm}" method="post">
-
-    <input type="hidden" th:field="*{id}"/>
-
-    <label for="title">Title:</label>
-    <input id="title" type="text" th:field="*{title}" required/>
-    <br/>
-
-    <label for="description">Description:</label>
-    <textarea id="description" th:field="*{description}" required></textarea>
-    <br/>
-
-    <label for="location">Location:</label>
-    <input id="location" type="text" th:field="*{location}" required/>
-    <br/>
-
-    <label for="requirements">Requirements:</label>
-    <textarea id="requirements" th:field="*{requirements}" required></textarea>
-    <br/>
-
-    <label for="skills">Required Skills:</label>
-    <select id="skills" th:field="*{requiredSkillIds}" multiple>
-        <option th:each="skill : ${skills}"
-                th:value="${skill.id}"
-                th:text="${skill.name}"></option>
-    </select>
-    <br/>
-
-    <button type="submit">Submit</button>
-</form>
-
-<!-- Back to Job List -->
-<a href="/jobs">Back to Job List</a>
-
+<script>
+    (function () {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
 </body>
 </html>
-

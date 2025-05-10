@@ -11,31 +11,35 @@
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
+<div class="dashboard-container">
 
-<h1>My Job Applications</h1>
+    <div th:replace="~{fragments/sidebar}"></div>
 
-<table>
-    <thead>
-    <tr>
-        <th>Job Title</th>
-        <th>Company</th>
-        <th>Status</th>
-        <th>Details</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="jobApplication : ${jobApplications}">
-        <td th:text="${jobApplication.job.title}"></td>
-        <td th:text="${jobApplication.job.company.name}"></td>
-        <td th:text="${jobApplication.status}"></td>
-        <td>
-            <a th:href="@{'/applications/' + ${jobApplication.id}}">View</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <h1>My Job Applications</h1>
 
-<a href="/jobs">Browse Jobs</a>
+    <table>
+        <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="jobApplication : ${jobApplications}">
+            <td th:text="${jobApplication.job.title}"></td>
+            <td th:text="${jobApplication.job.company.name}"></td>
+            <td th:text="${jobApplication.status}"></td>
+            <td>
+                <a th:href="@{'/applications/' + ${jobApplication.id}}">View</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
+    <a href="/jobs">Browse Jobs</a>
+
+</div>
 </body>
 </html>

@@ -1,7 +1,26 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Candidate Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize Select2
+            $('select').select2({
+                placeholder: "Select skills...",
+                width: '100%'
+            });
+        });
+
+        function toggleFilters() {
+            var filterSection = document.getElementById('filters');
+            filterSection.style.display = filterSection.style.display === 'none' ? 'block' : 'none';
+        }
+
         function goToPage(pageNumber) {
             document.getElementById("page").value = pageNumber;
             document.getElementById("searchForm").submit();
@@ -15,59 +34,80 @@
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
+<div class="dashboard-container">
 
-<form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get">
-    <!-- Location Filter -->
-    <input type="text" name="location" th:value="${criteria.location}" placeholder="Location" />
+    <div th:replace="~{fragments/sidebar}"></div>
 
-    <!-- Skills Multi-Select -->
-    <select name="skillIds" multiple>
-        <option th:each="skill : ${allSkills}"
-                th:value="${skill.id}"
-                th:selected="${criteria.skillIds.contains(skill.id)}"
-                th:text="${skill.name}">
-        </option>
-    </select>
+    <div class="container mt-4">
+        <h1 class="mb-4">Candidate Search</h1>
 
-    <!-- Hidden Job ID -->
-    <input type="hidden" name="jobId" th:value="${job.id}" />
+        <div class="mb-3">
+            <button class="btn btn-outline-secondary" onclick="toggleFilters()">Toggle Filters</button>
+        </div>
 
-    <!-- Page tracking -->
-    <input type="hidden" id="page" name="page" th:value="${currentPage}" />
-    <button type="submit">Search</button>
-</form>
+        <form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get" class="mb-4">
+            <!-- Filter Section (collapsible) -->
+            <div id="filters" class="collapse">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="location" th:value="${criteria.location}"
+                               placeholder="Location"/>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" name="skillIds" multiple>
+                            <option th:each="skill : ${allSkills}"
+                                    th:value="${skill.id}"
+                                    th:selected="${criteria.skillIds.contains(skill.id)}"
+                                    th:text="${skill.name}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-<!-- Candidate List -->
-<div th:if="${#lists.isEmpty(candidatesPage.content)}">
-    <p>No candidates found.</p>
-</div>
+            <input type="hidden" name="jobId" th:value="${job.id}"/>
+            <input type="hidden" id="page" name="page" th:value="${currentPage}"/>
+            <button type="submit" class="btn btn-primary mt-3">Search</button>
+        </form>
 
-<div th:if="${not #lists.isEmpty(candidatesPage.content)}">
-    <ul>
-        <li th:each="candidateResult : ${candidatesPage.getContent()}">
-            <!--/*@thymesVar id="candidateResult" type="com.butenov.jobplatform.candidates.dto.CandidateIntellectualSearchResult"*/-->
-            <span th:text="${candidateResult.candidate.firstName}"></span> <span th:text="${candidateResult.candidate.lastName}"></span>  -
-<!--            <span th:text="${result.candidate.location}"></span>-->
-            <span>location placeholder</span>
-            <span th:text="${candidateResult.jobCandidateMatch.matchScore * 100} + '%'"></span>
-            <!-- Link to candidate profile if applicable -->
-            <a th:href="@{/candidates/{id}(id=${candidateResult.candidate.id})}">View Profile</a>
-        </li>
-    </ul>
+        <div th:if="${#lists.isEmpty(candidatesPage.content)}" class="alert alert-warning">
+            <p>No candidates found.</p>
+        </div>
 
-    <!-- Pagination Controls -->
-    <div>
-        <span>Page: </span>
-        <a href="#" th:if="${currentPage > 0}" th:onclick="|goToPage(${currentPage - 1})|">Previous</a> |
-        <span th:text="${currentPage + 1}"></span> |
-        <a href="#" th:if="${currentPage < totalPages - 1}" th:onclick="|goToPage(${currentPage + 1})|">Next</a>
+        <div th:if="${not #lists.isEmpty(candidatesPage.content)}">
+            <ul class="list-group mb-4">
+                <li class="list-group-item" th:each="candidateResult : ${candidatesPage.getContent()}">
+                    <span th:text="${candidateResult.candidate.firstName}"></span>
+                    <span th:text="${candidateResult.candidate.lastName}"></span> -
+                    <span>Location placeholder</span>
+                    <span th:text="${candidateResult.jobCandidateMatch.matchScore * 100} + '%'"></span>
+                    <a class="btn btn-link" th:href="@{/candidates/{id}(id=${candidateResult.candidate.id})}">View
+                        Profile</a>
+                </li>
+            </ul>
+
+            <!-- Pagination -->
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" href="#" th:onclick="|goToPage(${currentPage - 1})|">Previous</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link" th:text="${currentPage + 1}"></span>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link" href="#" th:onclick="|goToPage(${currentPage + 1})|">Next</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="text-center mt-3">
+                <span th:text="'Total pages: ' + ${totalPages}"></span>
+                <span th:text="'Total candidates: ' + ${totalItems}"></span>
+            </div>
+        </div>
     </div>
-
-    <div>
-        <span th:text="'Total pages: ' + ${totalPages}"></span>
-        <span th:text="'Total candidates: ' + ${totalItems}"></span>
-    </div>
 </div>
-
 </body>
 </html>
+

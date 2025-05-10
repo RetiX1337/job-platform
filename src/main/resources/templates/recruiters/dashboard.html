@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Recruiter Dashboard</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div sec:authorize="@securityUtil.isCandidate()">
@@ -10,42 +11,45 @@
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
+<div class="dashboard-container">
 
-<h1>Recruiter Dashboard</h1>
+    <div th:replace="~{fragments/sidebar}"></div>
 
-<section>
-    <h2>Your Latest Job Postings</h2>
-    <ul>
-        <li th:each="job : ${latestJobs}">
-            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}">Job title</a>
-            - <span th:text="${#dates.format(job.createdAt, 'dd-MM-yyyy')}"></span>
-        </li>
-    </ul>
-    <a th:href="@{/jobs}">See all</a>
-</section>
+    <h1>Recruiter Dashboard</h1>
 
-<section>
-    <h2>Recent Applications</h2>
-    <ul>
-        <li th:each="app : ${latestApplications}">
-            <strong th:text="${app.candidate.firstName + ' ' + app.candidate.lastName}">Candidate</strong>
-            applied for
-            <span th:text="${app.job.title}">Job</span>
-        </li>
-    </ul>
-    <a th:href="@{/applications/latest}">See all</a>
-</section>
+    <section>
+        <h2>Your Latest Job Postings</h2>
+        <ul>
+            <li th:each="job : ${latestJobs}">
+                <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}">Job title</a>
+                - <span th:text="${#dates.format(job.createdAt, 'dd-MM-yyyy')}"></span>
+            </li>
+        </ul>
+        <a th:href="@{/jobs}">See all</a>
+    </section>
 
-<section th:if="${!candidateSearchResults.isEmpty()}">
-    <h2>Suggested Candidates for <span th:text="${latestJob.title}"></span></h2>
-    <ul>
-        <li th:each="candidateSearchResult : ${candidateSearchResults}">
-            <a th:href="@{/candidates/{id}(id=${candidateSearchResult.candidate.id})}"
-               th:text="${candidateSearchResult.candidate.firstName + ' ' + candidateSearchResult.candidate.lastName}">Candidate</a>
-            <span th:text="'Match score: ' + ${candidateSearchResult.jobCandidateMatch.matchScore * 100} + '%'"></span>
-        </li>
-    </ul>
-</section>
+    <section>
+        <h2>Recent Applications</h2>
+        <ul>
+            <li th:each="app : ${latestApplications}">
+                <strong th:text="${app.candidate.firstName + ' ' + app.candidate.lastName}">Candidate</strong>
+                applied for
+                <span th:text="${app.job.title}">Job</span>
+            </li>
+        </ul>
+        <a th:href="@{/applications/latest}">See all</a>
+    </section>
 
+    <section th:if="${!candidateSearchResults.isEmpty()}">
+        <h2>Suggested Candidates for <span th:text="${latestJob.title}"></span></h2>
+        <ul>
+            <li th:each="candidateSearchResult : ${candidateSearchResults}">
+                <a th:href="@{/candidates/{id}(id=${candidateSearchResult.candidate.id})}"
+                   th:text="${candidateSearchResult.candidate.firstName + ' ' + candidateSearchResult.candidate.lastName}">Candidate</a>
+                <span th:text="'Match score: ' + ${candidateSearchResult.jobCandidateMatch.matchScore * 100} + '%'"></span>
+            </li>
+        </ul>
+    </section>
+</div>
 </body>
 </html>

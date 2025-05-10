@@ -1,7 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Candidate Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div sec:authorize="@securityUtil.isCandidate()">
@@ -10,49 +17,119 @@
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
-<h1>Welcome, <span th:text="${candidate.firstName}"/>!</h1>
+<div class="dashboard-container">
 
-<section>
-    <h2>Your Profile</h2>
-    <div th:if="${profile != null}">
-        <div th:unless="${profile.skills.isEmpty()}">
-            <p>Skills:</p>
-            <ul>
-                <li th:each="skill : ${profile.skills}" th:text="${skill.name}"></li>
-            </ul>
+    <div th:replace="~{fragments/sidebar}"></div>
+
+    <div class="main-content">
+        <h1 class="mb-4">Welcome, <span th:text="${candidate.firstName}">User</span>!</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <a th:href="@{/candidates/me}" class="text-decoration-none text-dark">
+                    <div class="card card-hover h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">Your Profile</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 th:text="${candidate.firstName} + ' ' + ${candidate.lastName}">Full Name</h6>
+                            <p class="text-muted small" th:text="${candidate.email}">email@example.com</p>
+<!--                            <p th:if="${profile.bio != null}" class="mb-2" th:text="${#strings.abbreviate(profile.bio, 100)}">-->
+<!--                                A short bio or summary of skills...-->
+<!--                            </p>-->
+                            <div th:if="${!profile.skills.isEmpty()}">
+                                <p class="mb-1"><strong>Top Skills:</strong></p>
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item badge bg-secondary text-white small"
+                                        th:each="skill,iterStat : ${profile.skills}"
+                                        th:text="${skill.name}"
+                                        th:if="${iterStat.index < 3}">
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Bookmarked Jobs Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card card-hover h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Bookmarked Jobs</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item link-item" th:each="job : ${bookmarks}">
+                                <a th:href="@{'/jobs/' + ${job.id}}"
+                                   class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span th:text="${job.title}">Job Title</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a th:href="@{/candidates/bookmarks}" class="btn btn-sm btn-primary">See all</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applications Section -->
+            <div class="col-md-6">
+                <div class="card card-hover h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Applications</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item link-item" th:each="app : ${applications}">
+                                <a th:href="@{/applications/{id}(id=${app.id})}"
+                                   class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span th:text="${app.job.title}">Job Title</span>
+                                    <span class="badge bg-secondary" th:text="${app.status}">Status</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a th:href="@{/applications}" class="btn btn-sm btn-primary">See all</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suggested Jobs Section -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card card-hover h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Suggested Jobs</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item link-item d-flex align-items-center"
+                                th:each="s : ${suggestedJobs}">
+                                <a th:href="@{'/jobs/' + ${s.job.id}}"
+                                   class="text-decoration-none d-flex justify-content-between align-items-center w-100">
+                                    <span th:text="${s.job.title}" class="me-3">Job Title</span>
+                                    <div class="progress-container w-25">
+                                        <div th:replace="~{fragments/progress-bar :: progressBar(score=${s.jobCandidateMatch.matchScore})}"></div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a th:href="@{/jobs/search-intellectual}" class="btn btn-sm btn-primary">See all</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</section>
+</div>
 
-<section>
-    <h2>Bookmarked Jobs</h2>
-    <ul>
-        <li th:each="job : ${bookmarks}">
-            <a th:href="@{'/jobs/' + ${job.id}}" th:text="${job.title}"></a>
-        </li>
-    </ul>
-    <a th:href="@{/candidates/bookmarks}">See all</a>
-</section>
-
-<section>
-    <h2>Your Applications</h2>
-    <ul>
-        <li th:each="app : ${applications}">
-            <span th:text="${app.job.title}"></span> –
-            <span th:text="${app.status}"></span>
-        </li>
-    </ul>
-    <a th:href="@{/applications}">See all</a>
-</section>
-
-<section>
-    <h2>Suggested Jobs</h2>
-    <ul>
-        <li th:each="suggestedJob : ${suggestedJobs}">
-            <a th:href="@{'/jobs/' + ${suggestedJob.job.id}}" th:text="${suggestedJob.job.title} + ' Match score: ' + ${suggestedJob.jobCandidateMatch.matchScore * 100} + '%'"></a>
-        </li>
-    </ul>
-    <a th:href="@{/jobs/search-intellectual}">See all</a>
-</section>
 </body>
 </html>

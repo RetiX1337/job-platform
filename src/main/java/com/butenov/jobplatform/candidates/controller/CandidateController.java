@@ -80,16 +80,9 @@ public class CandidateController
 			@ModelAttribute("candidateProfileEditingDto") final CandidateProfileEditingDto candidateProfileEditingDto)
 	{
 		final Candidate candidate = candidateUtil.getAuthenticatedCandidate();
-		if (candidateProfileEditingDto.getId().equals(candidate.getId()))
-		{
-			candidateService.updateCandidateProfile(candidate, candidateProfileEditingDto);
+		candidateService.updateCandidateProfile(candidate, candidateProfileEditingDto);
 
-			return "redirect:/candidates/me";
-		}
-		else
-		{
-			throw new AccessDeniedException("You are not authorized to edit this profile.");
-		}
+		return "redirect:/candidates/me";
 	}
 
 	@PreAuthorize("@securityUtil.isCandidate()")
@@ -192,7 +185,8 @@ public class CandidateController
 				                          .lastName(candidate.getLastName())
 				                          .jobExperienceList(new ArrayList<>(candidate.getCandidateProfile().getJobExperiences()))
 				                          .educationList(new ArrayList<>(candidate.getCandidateProfile().getEducations()))
-				                          .skillIds(candidate.getCandidateProfile().getSkills().stream().map(Skill::getId).toList())
+				                          .skillIds(
+						                          candidate.getCandidateProfile().getSkills().stream().map(Skill::getId).toList())
 				                          .build();
 
 		model.addAttribute("candidateProfileEditingDto", candidateProfileEditingDto);
