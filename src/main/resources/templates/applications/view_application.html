@@ -9,32 +9,43 @@
     <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
+<!-- Headers -->
 <div sec:authorize="@securityUtil.isCandidate()">
     <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
+
+<!-- Dashboard Layout -->
 <div class="dashboard-container">
     <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
     <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
-    <div class="container mt-4">
-        <h1 class="mb-4 text-center">Application Details</h1>
 
+    <div class="container mt-4">
         <div class="card mb-4">
+            <div class="card-header">
+                <h1 class="mb-4 text-center">Application Details</h1>
+            </div>
+
+            <!-- Job Application Information -->
             <div class="card-body">
                 <h2 class="card-title">Job Information</h2>
-                <p><strong>Job:</strong> <a th:href="@{'/jobs/' + ${jobApplication.job.id}}" th:text="${jobApplication.job.title}"></a></p>
-                <p><strong>Candidate:</strong> <span th:text="${jobApplication.candidate.firstName + ' ' + jobApplication.candidate.lastName}"></span></p>
+                <p><strong>Job:</strong> <a th:href="@{'/jobs/' + ${jobApplication.job.id}}"
+                                            th:text="${jobApplication.job.title}"></a></p>
+                <p><strong>Candidate:</strong><a th:href="@{'/candidates/' + ${jobApplication.candidate.id}}">
+                    <span th:text="${jobApplication.candidate.firstName + ' ' + jobApplication.candidate.lastName}"></span></a>
+                </p>
                 <p><strong>Status:</strong> <span th:text="${jobApplication.status}"></span></p>
                 <p><strong>Feedback:</strong></p>
                 <p th:text="${jobApplication.feedback != null ? jobApplication.feedback : 'No feedback yet.'}"></p>
             </div>
         </div>
 
+        <!-- Recruiter Update Section -->
         <div sec:authorize="@securityUtil.isRecruiter()" class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">Candidate's Contact Information</h2>
+                <h2 class="card-title">Candidate Contact</h2>
                 <p><strong>Email:</strong> <span th:text="${jobApplication.candidate.email}"></span></p>
                 <form th:action="@{'/applications/' + ${jobApplication.id} + '/update'}" method="post">
                     <div class="mb-3">
@@ -45,13 +56,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="feedback" class="form-label">Feedback:</label>
-                        <textarea name="feedback" id="feedback" rows="4" class="form-control" th:text="${jobApplication.feedback}"></textarea>
+                        <textarea name="feedback" id="feedback" rows="4" class="form-control"
+                                  th:text="${jobApplication.feedback}"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Application</button>
                 </form>
             </div>
         </div>
 
+        <!-- Back Button -->
         <div class="text-center mt-4">
             <a href="/applications/latest" class="btn btn-secondary">Back to Applications</a>
         </div>

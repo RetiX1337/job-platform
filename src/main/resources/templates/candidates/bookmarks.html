@@ -18,29 +18,35 @@
     <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
     <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
     <div class="container mt-4">
-        <h1 class="mb-4">Your Bookmarked Jobs</h1>
 
-        <div th:if="${#lists.isEmpty(bookmarkedJobs)}" class="alert alert-warning">
-            <p>You haven't bookmarked any jobs yet.</p>
-        </div>
 
-        <div th:unless="${#lists.isEmpty(bookmarkedJobs)}">
-            <ul class="list-group">
-                <li class="list-group-item" th:each="job : ${bookmarkedJobs}">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <a th:href="@{'/jobs/' + ${job.id}}" class="text-decoration-none">
-                                <h5 th:text="${job.title}">Job Title</h5>
-                            </a>
-                            <p class="mb-1 text-muted" th:text="${job.company.name}">Company Name</p>
-                            <p class="mb-0 text-muted" th:text="${job.location}">Location</p>
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-4">Your Bookmarked Jobs</h1>
+            </div>
+
+            <div th:if="${#lists.isEmpty(bookmarkedJobs)}" class="alert alert-warning">
+                <p>You haven't bookmarked any jobs yet.</p>
+            </div>
+
+            <div class="card-body p-0" th:unless="${#lists.isEmpty(bookmarkedJobs)}">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item link-item" th:each="job : ${bookmarkedJobs}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <a th:href="@{'/jobs/' + ${job.id}}" class="text-decoration-none">
+                                    <h5 th:text="${job.title}">Job Title</h5>
+                                </a>
+                                <p class="mb-1 text-muted" th:text="${job.company.name}">Company Name</p>
+                                <p class="mb-0 text-muted" th:text="${job.location}">Location</p>
+                            </div>
+                            <form th:action="@{'/jobs/bookmark/' + ${job.id}}" method="post">
+                                <button type="submit" class="btn btn-outline-danger">♥</button>
+                            </form>
                         </div>
-                        <form th:action="@{'/jobs/bookmark/' + ${job.id}}" method="post">
-                            <button type="submit" class="btn btn-outline-danger">♥</button>
-                        </form>
-                    </div>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

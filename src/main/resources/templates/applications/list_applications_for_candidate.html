@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+    <meta charset="UTF-8">
     <title>My Job Applications</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -13,40 +14,39 @@
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
+
 <div class="dashboard-container">
     <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
     <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
+
     <div class="container mt-4">
-        <h1 class="text-center mb-4">My Job Applications</h1>
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-4">My Job Applications</h1>
+            </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead class="table-dark">
-                <tr>
-                    <th>Job Title</th>
-                    <th>Company</th>
-                    <th>Status</th>
-                    <th>Details</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="jobApplication : ${jobApplications}">
-                    <td th:text="${jobApplication.job.title}"></td>
-                    <td th:text="${jobApplication.job.company.name}"></td>
-                    <td th:text="${jobApplication.status}"></td>
-                    <td>
-                        <a th:href="@{'/applications/' + ${jobApplication.id}}" class="btn btn-primary btn-sm">View</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+            <div th:if="${#lists.isEmpty(jobApplications)}" class="alert alert-info">
+                <p>You haven't applied for any jobs yet.</p>
+            </div>
 
-        <div class="text-center mt-4">
-            <a href="/jobs" class="btn btn-secondary">Browse Jobs</a>
+            <div class="card-body p-0" th:unless="${#lists.isEmpty(jobApplications)}">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item link-item" th:each="jobApplication : ${jobApplications}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <a th:href="@{'/jobs/' + ${jobApplication.job.id}}" class="text-decoration-none">
+                                    <h5 th:text="${jobApplication.job.title}">Job Title</h5>
+                                </a>
+                                <p class="mb-1 text-muted" th:text="${jobApplication.job.company.name}">Company Name</p>
+                                <p class="mb-1 text-muted" th:text="${jobApplication.job.location}">Location</p>
+                            </div>
+                            <span class="badge bg-primary" th:text="${jobApplication.status}">Pending</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
-
 </div>
 </body>
 </html>

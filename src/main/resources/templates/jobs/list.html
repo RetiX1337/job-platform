@@ -8,6 +8,8 @@
     <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
+
+<!-- Headers -->
 <div sec:authorize="@securityUtil.isCandidate()">
     <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
@@ -15,41 +17,51 @@
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
 
+<!-- Sidebar + Content -->
 <div class="dashboard-container">
     <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
     <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
+
     <div class="container mt-4">
-        <h1 class="mb-4 text-center">Job List</h1>
-        <div class="d-flex justify-content-end mb-3">
-            <a sec:authorize="@securityUtil.isRecruiter()" href="/jobs/create" class="btn btn-primary">Create New
-                Job</a>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">Job List</h1>
+                <a sec:authorize="@securityUtil.isRecruiter()" href="/jobs/create" class="btn btn-primary">
+                    + Create New Job
+                </a>
+            </div>
+
+            <div class="card-body p-0">
+                <div th:if="${#lists.isEmpty(jobs)}" class="alert alert-warning m-3">
+                    <p>No jobs available at the moment.</p>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(jobs)}">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item link-item" th:each="job : ${jobs}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a th:href="@{'/jobs/' + ${job.id}}" class="text-decoration-none">
+                                        <h5 th:text="${job.title}">Job Title</h5>
+                                    </a>
+                                    <p class="mb-1 text-muted" th:text="${job.company.name}">Company Name</p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a th:href="@{'/jobs/edit/' + ${job.id}}" class="btn btn-warning btn-sm">Edit</a>
+                                    <a th:href="@{'/jobs/' + ${job.id}}" class="btn btn-info btn-sm">Show</a>
+                                    <form sec:authorize="@securityUtil.isRecruiter()"
+                                          th:action="@{/jobs/delete/{id}(id=${job.id})}" method="post">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-            <tr>
-                <th>Title</th>
-                <th>Company</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="job : ${jobs}">
-                <td th:text="${job.title}"></td>
-                <td th:text="${job.company.name}"></td>
-                <td>
-                    <div class="d-flex gap-2">
-                        <a th:href="@{/jobs/edit/__${job.id}__}" class="btn btn-warning btn-sm">Edit</a>
-                        <a th:href="@{/jobs/__${job.id}__}" class="btn btn-info btn-sm">Show</a>
-                        <form sec:authorize="@securityUtil.isRecruiter()" th:action="@{/jobs/delete/{id}(id=${job.id})}"
-                              method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
     </div>
 </div>
 </body>
 </html>
+

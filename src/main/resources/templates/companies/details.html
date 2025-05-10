@@ -10,44 +10,63 @@
 </head>
 <body>
 
+<!-- Headers -->
 <div sec:authorize="@securityUtil.isCandidate()">
     <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
 <div sec:authorize="@securityUtil.isRecruiter()">
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
+
+<!-- Sidebar + Content -->
 <div class="dashboard-container">
     <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
     <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
+
     <div class="container mt-4">
-        <h1 class="mb-4" th:text="${company.name}">Company Name</h1>
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0" th:text="${company.name}">Company Name</h1>
+            </div>
 
-        <div class="mb-4">
-            <p class="text-muted" th:if="${company.description}" th:text="${company.description}"></p>
-        </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <p class="text-muted" th:if="${company.description}" th:text="${company.description}"></p>
+                </div>
 
-        <div class="mb-4">
-            <h2>Latest Jobs</h2>
-            <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between align-items-center"
-                    th:each="job : ${latestJobs}">
-                    <div>
-                        <a th:href="@{/jobs/{id}(id=${job.id})}" class="text-decoration-none fw-bold"
-                           th:text="${job.title}">Job Title</a>
-                        <p class="mb-0 text-muted" th:text="${#temporals.format(job.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}"></p>
+                <div class="container mt-4">
+                    <div class="card card-hover h-100">
+                        <div class="card-header" style="background: #f5f5f5; color: #333333">
+                            <h5 class="mb-0" th:text="'Latest Jobs at ' + ${company.name}">Latest Jobs</h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item link-item" th:each="job : ${latestJobs}">
+                                    <a th:href="@{'/jobs/' + ${job.id}}"
+                                       class="text-decoration-none d-flex justify-content-between align-items-center">
+                                        <span th:text="${job.title}">Job Title</span>
+                                        <span class="text-muted small" th:text="${#dates.format(job.createdAt, 'dd-MM-yyyy')}"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="card-footer text-end">
+                            <a th:href="@{/jobs/search(companyId=${company.id})}" class="btn btn-sm btn-primary">
+                                See all jobs →
+                            </a>
+                        </div>
                     </div>
-                </li>
-            </ul>
-        </div>
 
-        <div class="mb-4">
-            <a th:href="@{/jobs/search(companyId=${company.id})}" class="btn btn-primary">
-                View all jobs from this company →
-            </a>
+                    <div class="text-center mt-3">
+                        <a th:href="@{/jobs}" class="btn btn-secondary">Back to all jobs</a>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <a th:href="@{/jobs}" class="btn btn-secondary">Back to all jobs</a>
     </div>
 </div>
+
 </body>
 </html>

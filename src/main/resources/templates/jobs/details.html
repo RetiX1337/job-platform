@@ -10,6 +10,8 @@
     <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
+
+<!-- Headers -->
 <div sec:authorize="@securityUtil.isCandidate()">
     <div th:replace="~{fragments/candidate-header :: header}"></div>
 </div>
@@ -17,63 +19,70 @@
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
 
+<!-- Sidebar + Content -->
 <div class="dashboard-container">
     <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
     <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
+
     <div class="container mt-4">
-        <h1 class="mb-4" th:text="${job.title}">Job Title</h1>
-
-        <div class="mb-4">
-            <p><strong>Company:</strong> <span th:text="${job.getCompany().getName()}">Company Name</span></p>
-            <p><strong>Location:</strong> <span th:text="${job.location}">Location</span></p>
-            <p><strong>Description:</strong> <span th:text="${job.description}">Description</span></p>
-            <p><strong>Requirements:</strong> <span th:text="${job.requirements}">Requirements</span></p>
-        </div>
-
-        <div class="mb-4">
-            <h3>Required Skills</h3>
-            <ul class="list-group">
-                <li class="list-group-item" th:each="skill : ${job.requiredSkills}" th:text="${skill.getName()}">Skill
-                </li>
-            </ul>
-        </div>
-
-        <div th:if="${jobCandidateMatch != null}" class="mb-4">
-            <h3>Intellectual Job Match</h3>
-            <div class="w-25">
-                <div th:replace="~{fragments/progress-bar :: progressBar(score=${jobCandidateMatch.matchScore})}"></div>
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0" th:text="${job.title}">Job Title</h1>
             </div>
-            <p th:text="${jobCandidateMatch.intellectualAnalysisJustification}">Justification</p>
-        </div>
 
-        <div th:if="${@securityUtil.isRecruiterAuthorizedToModifyJob(job)}" class="mb-4">
-            <form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get">
-                <input type="hidden" name="jobId" th:value="${job.id}"/>
-                <button type="submit" class="btn btn-primary">Search Candidates</button>
-            </form>
-        </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <p><strong>Company:</strong> <span th:text="${job.getCompany().getName()}">Company Name</span></p>
+                    <p><strong>Location:</strong> <span th:text="${job.location}">Location</span></p>
+                    <p><strong>Description:</strong> <span th:text="${job.description}">Description</span></p>
+                    <p><strong>Requirements:</strong> <span th:text="${job.requirements}">Requirements</span></p>
+                </div>
 
-        <div sec:authorize="@securityUtil.isCandidate()" class="mb-4">
-            <form th:if="${!@candidateUtil.hasAlreadyApplied(job)}" th:action="@{/applications/apply/__${id}__}"
-                  method="post">
-                <input type="hidden" name="jobId" th:value="${job.id}"/>
-                <button type="submit" class="btn btn-success">Apply for this Job</button>
-            </form>
-            <p th:if="${@candidateUtil.hasAlreadyApplied(job)}" class="text-success">You have already applied for this
-                job.</p>
-        </div>
+                <div class="mb-4">
+                    <h3>Required Skills</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" th:each="skill : ${job.requiredSkills}" th:text="${skill.getName()}">Skill</li>
+                    </ul>
+                </div>
 
-        <div sec:authorize="@securityUtil.isCandidate()" class="mb-4">
-            <form th:action="@{'/jobs/bookmark/' + ${job.id}}" method="post">
-                <button type="submit" class="btn btn-outline-danger">
-                    <span th:if="${bookmark}">♥</span>
-                    <span th:unless="${bookmark}">♡</span>
-                </button>
-            </form>
-        </div>
+                <div th:if="${jobCandidateMatch != null}" class="mb-4">
+                    <h3>Intellectual Job Match</h3>
+                    <div class="w-25">
+                        <div th:replace="~{fragments/progress-bar :: progressBar(score=${jobCandidateMatch.matchScore})}"></div>
+                    </div>
+                    <p th:text="${jobCandidateMatch.intellectualAnalysisJustification}">Justification</p>
+                </div>
 
-        <a href="/jobs" class="btn btn-secondary">Back to Job Listings</a>
+                <div th:if="${@securityUtil.isRecruiterAuthorizedToModifyJob(job)}" class="mb-4">
+                    <form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get">
+                        <input type="hidden" name="jobId" th:value="${job.id}"/>
+                        <button type="submit" class="btn btn-primary">Search Candidates</button>
+                    </form>
+                </div>
+
+                <div sec:authorize="@securityUtil.isCandidate()" class="mb-4">
+                    <form th:if="${!@candidateUtil.hasAlreadyApplied(job)}" th:action="@{/applications/apply/__${id}__}"
+                          method="post">
+                        <input type="hidden" name="jobId" th:value="${job.id}"/>
+                        <button type="submit" class="btn btn-success">Apply for this Job</button>
+                    </form>
+                    <p th:if="${@candidateUtil.hasAlreadyApplied(job)}" class="text-success">You have already applied for this job.</p>
+                </div>
+
+                <div sec:authorize="@securityUtil.isCandidate()" class="mb-4">
+                    <form th:action="@{'/jobs/bookmark/' + ${job.id}}" method="post">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <span th:if="${bookmark}">♥</span>
+                            <span th:unless="${bookmark}">♡</span>
+                        </button>
+                    </form>
+                </div>
+
+                <a href="/jobs" class="btn btn-secondary">Back to Job Listings</a>
+            </div>
+        </div>
     </div>
 </div>
+
 </body>
 </html>

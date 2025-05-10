@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
@@ -13,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,20 +23,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.butenov.jobplatform.candidates.dto.CandidateProfileEditingDto;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.candidates.service.CandidateService;
 import com.butenov.jobplatform.candidates.service.CandidateUtil;
+import com.butenov.jobplatform.commons.SecurityUtil;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.service.JobService;
+import com.butenov.jobplatform.matching.model.JobCandidateMatch;
+import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
+import com.butenov.jobplatform.recruiters.model.Recruiter;
+import com.butenov.jobplatform.recruiters.service.RecruiterUtil;
 import com.butenov.jobplatform.skills.model.Skill;
 import com.butenov.jobplatform.skills.service.SkillService;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.java.Log;
 
 @Log
@@ -48,13 +57,19 @@ public class CandidateController
 	private final CandidateService candidateService;
 	private final SkillService skillService;
 	private final CandidateUtil candidateUtil;
+	private final RecruiterUtil recruiterUtil;
+	private final SecurityUtil securityUtil;
+	private final JobService jobService;
+	private final JobCandidateMatchService jobCandidateMatchService;
 
 	@PreAuthorize("@securityUtil.isRecruiter()")
 	@GetMapping("/{id}")
 	public String viewProfile(final Model model, final @PathVariable Long id)
 	{
 		final Candidate candidate = candidateService.findById(id);
+		final Recruiter recruiter = recruiterUtil.getAuthenticatedRecruiter();
 		model.addAttribute("candidate", candidate);
+		model.addAttribute("recruiterJobs", jobService.findAllByCompany(recruiter.getCompany()));
 		return "candidates/profile";
 	}
 
@@ -143,7 +158,7 @@ public class CandidateController
 
 			candidateService.updateCandidateFromCV(candidate);
 
-			return "redirect:/candidates/" + candidate.getId();
+			return "redirect:/candidates/me";
 		}
 		catch (final Exception e)
 		{
@@ -162,6 +177,24 @@ public class CandidateController
 
 		model.addAttribute("bookmarkedJobs", bookmarkedJobs);
 		return "candidates/bookmarks";
+	}
+
+	@PreAuthorize("@securityUtil.isRecruiter()")
+	@PostMapping("/match-score")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getCandidateMatchToJob(@RequestBody final MatchRequestDTO matchRequestDTO)
+	{
+		final Candidate candidate = candidateService.findById(matchRequestDTO.getCandidateId());
+		final Job job = jobService.findById(matchRequestDTO.getJobId());
+		securityUtil.validateRecruiterAuthorizedToModifyJob(job);
+
+		final JobCandidateMatch jobCandidateMatch = jobCandidateMatchService.getJobMatchScore(job, candidate);
+		final Map<String, Object> response = Map.of(
+				"justification", jobCandidateMatch.getIntellectualAnalysisJustification(),
+				"matchScore", jobCandidateMatch.getMatchScore()
+		);
+
+		return ResponseEntity.ok(response);
 	}
 
 	private String prepareCandidateEditForm(final Model model, final UserDetails userDetails)
@@ -193,5 +226,21 @@ public class CandidateController
 		model.addAttribute("skills", skillService.findAll());
 
 		return "candidates/edit-profile";
+	}
+
+	@Setter
+	@Getter
+	public static class MatchRequestDTO
+	{
+		private Long candidateId;
+		private Long jobId;
+	}
+
+	@Setter
+	@Getter
+	public static class MatchResponseDTO
+	{
+		private Long candidateId;
+		private Long jobId;
 	}
 }

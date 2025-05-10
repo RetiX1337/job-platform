@@ -1,44 +1,106 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register as Recruiter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .register-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .register-card h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 5px rgba(38, 143, 255, 0.5);
+            border-color: #268fff;
+        }
+        .btn-primary {
+            background: #6a11cb;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #2575fc;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .register-link a {
+            color: #6a11cb;
+            text-decoration: none;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Register as Recruiter</h1>
+<div class="register-card">
+    <h2>Register as Recruiter</h2>
 
-<form action="#" th:action="@{/register/recruiter}" th:object="${recruiterRegistrationInfo}" method="post">
-    <div>
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" th:field="*{firstName}" required/>
-    </div>
-    <div>
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" th:field="*{lastName}" required/>
-    </div>
-    <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" th:field="*{email}" required/>
-    </div>
-    <div>
-        <label for="password">Password</label>
-        <input type="password" id="password" th:field="*{password}" required/>
-    </div>
-    <div>
-        <label for="companyId">Company</label>
-        <select id="companyId" th:field="*{companyId}" required>
-            <option th:each="company : ${companies}" th:value="${company.id}" th:text="${company.name}"></option>
-        </select>
-    </div>
+    <form action="#" th:action="@{/register/recruiter}" th:object="${recruiterRegistrationInfo}" method="post">
+        <div class="form-group">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" id="firstName" th:field="*{firstName}" class="form-control" required />
+        </div>
 
-    <div>
-        <button type="submit">Register</button>
-    </div>
+        <div class="form-group">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" id="lastName" th:field="*{lastName}" class="form-control" required />
+        </div>
 
-    <div th:if="${registrationError}">
-        <p th:text="${registrationError}"></p>
+        <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" th:field="*{email}" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" th:field="*{password}" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="companyId" class="form-label">Company</label>
+            <select id="companyId" th:field="*{companyId}" class="form-control" required>
+                <option th:each="company : ${companies}" th:value="${company.id}" th:text="${company.name}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+        </div>
+
+        <div th:if="${registrationError}" class="text-danger">
+            <p th:text="${registrationError}"></p>
+        </div>
+    </form>
+
+    <div class="register-link">
+        <p>Already have an account? <a th:href="@{/login}">Login</a></p>
     </div>
-</form>
+</div>
 
 </body>
 </html>

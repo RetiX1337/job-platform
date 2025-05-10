@@ -42,85 +42,93 @@
     <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
 
     <div class="container mt-4">
-        <h1 class="mb-4">Candidate Search for job:</h1>
-        <h3 th:text="${job.title}"></h3>
-
-        <form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get" class="mb-4">
-            <!-- Filter Section (collapsible) -->
-            <div class="input-group input-group-lg mb-3">
-            </span>
-                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
-                    Filters
-                </button>
-                <button type="submit" class="btn btn-primary ms-2">Search</button>
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-4">Candidate Search for job:</h1>
+                <h3 th:text="${job.title}"></h3>
             </div>
-            <div class="collapse" id="advancedFilters">
-                <div class="card card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="location" class="form-label">Location</label>
-                            <input type="text" id="location" name="location" th:value="${criteria.location}"
-                                   class="form-control" placeholder="e.g. New York"/>
+
+            <div class="card-body">
+                <form id="searchForm" th:action="@{/candidates/search-intellectual}" method="get" class="mb-4">
+                    <!-- Filter Section (collapsible) -->
+                    <div class="input-group input-group-lg mb-3">
+                        </span>
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
+                            Filters
+                        </button>
+                        <button type="submit" class="btn btn-primary ms-2">Search</button>
+                    </div>
+                    <div class="collapse" id="advancedFilters">
+                        <div class="card card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" id="location" name="location" th:value="${criteria.location}"
+                                           class="form-control" placeholder="e.g. New York"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="skills" class="form-label">Skills</label>
+                                    <select class="form-select" id="skills" th:attr="id='skills'" name="skillIds"
+                                            multiple="multiple">
+                                        <option th:each="skill : ${allSkills}" th:value="${skill.id}"
+                                                th:text="${skill.name}"
+                                                th:selected="${criteria.skillIds.contains(skill.id)}"></option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="skills" class="form-label">Skills</label>
-                            <select class="form-select" id="skills" th:attr="id='skills'" name="skillIds"
-                                    multiple="multiple">
-                                <option th:each="skill : ${allSkills}" th:value="${skill.id}" th:text="${skill.name}"
-                                        th:selected="${criteria.skillIds.contains(skill.id)}"></option>
-                            </select>
-                        </div>
+                    </div>
+
+                    <input type="hidden" name="jobId" th:value="${job.id}"/>
+                    <input type="hidden" id="page" name="page" th:value="${currentPage}"/>
+                </form>
+
+                <div th:if="${#lists.isEmpty(candidatesPage.content)}" class="alert alert-warning">
+                    <p>No candidates found.</p>
+                </div>
+
+                <div th:if="${not #lists.isEmpty(candidatesPage.content)}">
+                    <ul class="list-group mb-4">
+                        <li class="list-group-item" th:each="candidateResult : ${candidatesPage.getContent()}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a th:href="@{/candidates/{id}(id=${candidateResult.candidate.id})}"
+                                       class="text-decoration-none">
+                                        <strong th:text="${candidateResult.candidate.firstName} + ' ' + ${candidateResult.candidate.lastName}"></strong>
+                                    </a>
+                                    <p class="mb-0">
+                                        <!--                                <span th:text="${candidateResult.candidate.location}"></span>-->
+                                        <span>Location Placeholder</span>
+                                    </p>
+                                </div>
+                                <div class="w-25">
+                                    <div th:replace="~{fragments/progress-bar :: progressBar(score=${candidateResult.jobCandidateMatch.matchScore})}"></div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link" href="#" th:onclick="|goToPage(${currentPage - 1})|">Previous</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link" th:text="${currentPage + 1}"></span>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                                <a class="page-link" href="#" th:onclick="|goToPage(${currentPage + 1})|">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="text-center mt-3">
+                        <span th:text="'Total pages: ' + ${totalPages}"></span>
+                        <span th:text="'Total candidates: ' + ${totalItems}"></span>
                     </div>
                 </div>
-            </div>
-
-            <input type="hidden" name="jobId" th:value="${job.id}"/>
-            <input type="hidden" id="page" name="page" th:value="${currentPage}"/>
-        </form>
-
-        <div th:if="${#lists.isEmpty(candidatesPage.content)}" class="alert alert-warning">
-            <p>No candidates found.</p>
-        </div>
-
-        <div th:if="${not #lists.isEmpty(candidatesPage.content)}">
-            <ul class="list-group mb-4">
-                <li class="list-group-item" th:each="candidateResult : ${candidatesPage.getContent()}">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <a th:href="@{/candidates/{id}(id=${candidateResult.candidate.id})}" class="text-decoration-none">
-                                <strong th:text="${candidateResult.candidate.firstName} + ' ' + ${candidateResult.candidate.lastName}"></strong>
-                            </a>
-                            <p class="mb-0">
-<!--                                <span th:text="${candidateResult.candidate.location}"></span>-->
-                                <span>Location Placeholder</span>
-                            </p>
-                        </div>
-                        <div class="w-25">
-                            <div th:replace="~{fragments/progress-bar :: progressBar(score=${candidateResult.jobCandidateMatch.matchScore})}"></div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-
-            <!-- Pagination -->
-            <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" href="#" th:onclick="|goToPage(${currentPage - 1})|">Previous</a>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link" th:text="${currentPage + 1}"></span>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
-                        <a class="page-link" href="#" th:onclick="|goToPage(${currentPage + 1})|">Next</a>
-                    </li>
-                </ul>
-            </nav>
-
-            <div class="text-center mt-3">
-                <span th:text="'Total pages: ' + ${totalPages}"></span>
-                <span th:text="'Total candidates: ' + ${totalItems}"></span>
             </div>
         </div>
     </div>
