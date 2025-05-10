@@ -53,6 +53,7 @@ public class RecruiterDashboardController
 			model.addAttribute("candidateSearchResults", candidateSearchResults);
 		}
 
+		model.addAttribute("recruiter", recruiter);
 		model.addAttribute("latestJobs", latestJobs);
 		model.addAttribute("latestApplications", latestApplications.getContent());
 

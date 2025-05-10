@@ -15,9 +15,8 @@
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
 <div class="dashboard-container">
-
-    <div th:replace="~{fragments/sidebar}"></div>
-
+    <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
+    <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
     <div class="container mt-4">
         <h1 class="mb-4">Your Bookmarked Jobs</h1>
 

@@ -12,30 +12,38 @@
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
 
-<h1>Job Applications</h1>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
+    <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
+    <h1 class="mb-4 text-center">Job Applications</h1>
 
-<table>
-    <thead>
-    <tr>
-        <th>Candidate</th>
-        <th>Job Title</th>
-        <th>Status</th>
-        <th>Details</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="jobApplication : ${jobApplications}">
-        <td th:text="${jobApplication.candidate.firstName + ' ' + jobApplication.candidate.lastName}"></td>
-        <td th:text="${jobApplication.job.title}"></td>
-        <td th:text="${jobApplication.status}"></td>
-        <td>
-            <a th:href="@{'/applications/' + ${jobApplication.id}}">View</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+            <tr>
+                <th>Candidate</th>
+                <th>Job Title</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="jobApplication : ${jobApplications}">
+                <td th:text="${jobApplication.candidate.firstName + ' ' + jobApplication.candidate.lastName}"></td>
+                <td th:text="${jobApplication.job.title}"></td>
+                <td th:text="${jobApplication.status}"></td>
+                <td>
+                    <a th:href="@{'/applications/' + ${jobApplication.id}}" class="btn btn-primary btn-sm">View</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-<a href="/jobs">Back to Jobs</a>
+    <div class="text-center mt-4">
+        <a href="/jobs" class="btn btn-secondary">Back to Jobs</a>
+    </div>
+</div>
 
 </body>
 </html>

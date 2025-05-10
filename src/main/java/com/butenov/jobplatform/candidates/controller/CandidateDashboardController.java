@@ -1,6 +1,7 @@
 package com.butenov.jobplatform.candidates.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ public class CandidateDashboardController
 	private final JobApplicationService jobApplicationService;
 	private final CandidateUtil candidateUtil;
 
+	@PreAuthorize("@securityUtil.isCandidate()")
 	@GetMapping
 	public String showDashboard(final Model model)
 	{

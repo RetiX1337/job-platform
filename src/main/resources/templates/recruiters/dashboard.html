@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Recruiter Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -12,44 +16,88 @@
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
 <div class="dashboard-container">
+    <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
+    <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
+    <div class="main-content">
+        <h1 class="mb-4">Welcome, <span th:text="${recruiter.firstName}">Recruiter</span>!</h1>
 
-    <div th:replace="~{fragments/sidebar}"></div>
+        <!-- Latest Job Postings Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card card-hover h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Latest Job Postings</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item link-item" th:each="job : ${latestJobs}">
+                                <a th:href="@{'/jobs/' + ${job.id}}"
+                                   class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span th:text="${job.title}">Job Title</span>
+                                    <span class="text-muted small" th:text="${#dates.format(job.createdAt, 'dd-MM-yyyy')}"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a th:href="@{/jobs}" class="btn btn-sm btn-primary">See all</a>
+                    </div>
+                </div>
+            </div>
 
-    <h1>Recruiter Dashboard</h1>
+            <!-- Recent Applications Section -->
+            <div class="col-md-6">
+                <div class="card card-hover h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent Applications</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item link-item" th:each="app : ${latestApplications}">
+                                <a th:href="@{'/applications/' + ${app.id}}"
+                                   class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <strong th:text="${app.candidate.firstName + ' ' + app.candidate.lastName}">Candidate</strong>
+                                        applied for
+                                        <span th:text="${app.job.title}">Job</span>
+                                    </span>
+                                    <span class="text-muted small" th:text="${#dates.format(app.createdAt, 'dd-MM-yyyy')}"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a th:href="@{/applications/latest}" class="btn btn-sm btn-primary">See all</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <section>
-        <h2>Your Latest Job Postings</h2>
-        <ul>
-            <li th:each="job : ${latestJobs}">
-                <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}">Job title</a>
-                - <span th:text="${#dates.format(job.createdAt, 'dd-MM-yyyy')}"></span>
-            </li>
-        </ul>
-        <a th:href="@{/jobs}">See all</a>
-    </section>
-
-    <section>
-        <h2>Recent Applications</h2>
-        <ul>
-            <li th:each="app : ${latestApplications}">
-                <strong th:text="${app.candidate.firstName + ' ' + app.candidate.lastName}">Candidate</strong>
-                applied for
-                <span th:text="${app.job.title}">Job</span>
-            </li>
-        </ul>
-        <a th:href="@{/applications/latest}">See all</a>
-    </section>
-
-    <section th:if="${!candidateSearchResults.isEmpty()}">
-        <h2>Suggested Candidates for <span th:text="${latestJob.title}"></span></h2>
-        <ul>
-            <li th:each="candidateSearchResult : ${candidateSearchResults}">
-                <a th:href="@{/candidates/{id}(id=${candidateSearchResult.candidate.id})}"
-                   th:text="${candidateSearchResult.candidate.firstName + ' ' + candidateSearchResult.candidate.lastName}">Candidate</a>
-                <span th:text="'Match score: ' + ${candidateSearchResult.jobCandidateMatch.matchScore * 100} + '%'"></span>
-            </li>
-        </ul>
-    </section>
+        <!-- Suggested Candidates Section -->
+        <div class="row mb-4" th:if="${!candidateSearchResults.isEmpty()}">
+            <div class="col-md-12">
+                <div class="card card-hover h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Suggested Candidates for <span th:text="${latestJob.title}">Job</span></h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item link-item"
+                                th:each="candidateSearchResult : ${candidateSearchResults}">
+                                <a th:href="@{'/candidates/' + ${candidateSearchResult.candidate.id}}"
+                                   class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span th:text="${candidateSearchResult.candidate.firstName + ' ' + candidateSearchResult.candidate.lastName}">Candidate</span>
+                                    <div class="progress-container w-25">
+                                        <div th:replace="~{fragments/progress-bar :: progressBar(score=${candidateSearchResult.jobCandidateMatch.matchScore})}"></div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

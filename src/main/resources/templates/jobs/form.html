@@ -14,9 +14,8 @@
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
 <div class="dashboard-container">
-
-    <div th:replace="~{fragments/sidebar}"></div>
-
+    <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
+    <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
     <div class="container mt-4">
         <h2 class="mb-4" th:text="${jobForm.id == null ? 'Create Job' : 'Edit Job'}"></h2>
 

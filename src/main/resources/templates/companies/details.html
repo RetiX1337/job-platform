@@ -17,8 +17,8 @@
     <div th:replace="~{fragments/recruiter-header :: header}"></div>
 </div>
 <div class="dashboard-container">
-
-    <div th:replace="~{fragments/sidebar}"></div>
+    <div th:replace="~{fragments/candidate-sidebar}" sec:authorize="@securityUtil.isCandidate()"></div>
+    <div th:replace="~{fragments/recruiter-sidebar}" sec:authorize="@securityUtil.isRecruiter()"></div>
     <div class="container mt-4">
         <h1 class="mb-4" th:text="${company.name}">Company Name</h1>
 
@@ -34,7 +34,7 @@
                     <div>
                         <a th:href="@{/jobs/{id}(id=${job.id})}" class="text-decoration-none fw-bold"
                            th:text="${job.title}">Job Title</a>
-                        <p class="mb-0 text-muted" th:text="${#temporals.format(job.createdAt, 'yyyy-MM-dd')}"></p>
+                        <p class="mb-0 text-muted" th:text="${#temporals.format(job.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}"></p>
                     </div>
                 </li>
             </ul>

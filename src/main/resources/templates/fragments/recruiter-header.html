@@ -1,14 +1,19 @@
 <header th:fragment="header">
-    <nav>
-        <div>
-            <a th:href="@{/}">JobMatch</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">JobMatch</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}">Logout</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-
-        <ul>
-            <li><a th:href="@{/jobs}">Jobs</a></li>
-            <li><a th:href="@{/company}">My Company</a></li>
-            <li><a th:href="@{/applications/latest}">Latest Applications</a></li>
-            <li><a th:href="@{/logout}">Logout</a></li>
-        </ul>
     </nav>
 </header>
