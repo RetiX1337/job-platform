@@ -90,7 +90,7 @@
                     <ul class="list-group">
                         <li class="list-group-item" th:each="exp : ${candidate.candidateProfile.jobExperiences}">
                             <div class="fw-bold" th:text="${exp.jobTitle}">Job Title</div>
-                            <div class="text-muted" th:text="${exp.companyName} + ' • ' + exp.location">Company</div>
+                            <div class="text-muted" th:text="${exp.companyName} + ' • ' + ${exp.location}">Company</div>
                             <div class="text-muted small" th:text="${exp.startDate} + ' - ' + (${exp.endDate} ?: 'Present')">Duration</div>
                             <div th:text="${exp.description}">Description</div>
                         </li>
@@ -101,7 +101,7 @@
                     <h4>Education</h4>
                     <ul class="list-group">
                         <li class="list-group-item" th:each="edu : ${candidate.candidateProfile.educations}">
-                            <div class="fw-bold" th:text="${edu.degree} + ' in ' + edu.fieldOfStudy">Degree</div>
+                            <div class="fw-bold" th:text="${edu.degree} + ' in ' + ${edu.fieldOfStudy}">Degree</div>
                             <div class="text-muted" th:text="${edu.schoolName}">School</div>
                             <div class="text-muted small" th:text="${edu.startDate} + ' - ' + (${edu.endDate} ?: 'Present')">Duration</div>
                             <div th:text="${edu.description}">Description</div>

@@ -14,4 +14,10 @@ public class JobIntellectualSearchResult
 {
 	private Job job;
 	private JobCandidateMatch jobCandidateMatch;
+
+	public JobIntellectualSearchResult(final JobCandidateMatch jobCandidateMatch)
+	{
+		this.job = jobCandidateMatch.getJob();
+		this.jobCandidateMatch = jobCandidateMatch;
+	}
 }

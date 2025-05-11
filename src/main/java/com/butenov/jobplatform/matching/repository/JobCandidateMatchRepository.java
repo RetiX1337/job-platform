@@ -12,6 +12,8 @@ public interface JobCandidateMatchRepository extends JpaRepository<JobCandidateM
 {
 	Optional<JobCandidateMatch> findByJobAndCandidate(Job job, Candidate candidate);
 
+	Optional<JobCandidateMatch> findByJobIdAndCandidateId(Long jobid, Long candidateId);
+
 	void deleteByJob(Job job);
 
 	void deleteByCandidate(Candidate candidate);

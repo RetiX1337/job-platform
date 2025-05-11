@@ -17,6 +17,7 @@ import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.repository.JobRepository;
 import com.butenov.jobplatform.jobs.repository.JobSpecifications;
 import com.butenov.jobplatform.jobs.service.JobSearchService;
+import com.butenov.jobplatform.matching.model.JobCandidateMatch;
 import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.skills.model.Skill;
 
@@ -63,16 +64,12 @@ public class DefaultJobSearchService implements JobSearchService
 
 		final List<Job> topJobs = preRankJobs(preFilteredJobs.getContent(), candidate);
 
-		topJobs.forEach(job -> jobCandidateMatchService.getJobMatchScore(job, candidate));
-
-		final List<JobIntellectualSearchResult> topJobsWithMatch = topJobs.stream()
-		                                                                  .map(job -> new JobIntellectualSearchResult(job,
-				                                                                  jobCandidateMatchService.getJobMatchScore(job,
-						                                                                  candidate)))
-		                                                                  .sorted(Comparator.<JobIntellectualSearchResult>comparingDouble(
-				                                                                  job -> job.getJobCandidateMatch()
-				                                                                            .getMatchScore()).reversed())
-		                                                                  .toList();
+		final List<JobIntellectualSearchResult> topJobsWithMatch = jobCandidateMatchService.getJobMatchScores(topJobs, candidate).stream()
+		                                                                                .map(JobIntellectualSearchResult::new)
+		                                                                                .sorted(Comparator.<JobIntellectualSearchResult>comparingDouble(
+				                                                                                job -> job.getJobCandidateMatch()
+				                                                                                          .getMatchScore()).reversed())
+		                                                                                .toList();
 
 		return new PageImpl<>(topJobsWithMatch, pageable, preFilteredJobs.getTotalElements());
 	}

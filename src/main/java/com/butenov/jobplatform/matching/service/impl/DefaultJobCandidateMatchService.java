@@ -1,18 +1,24 @@
 package com.butenov.jobplatform.matching.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.stereotype.Service;
 
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.jobs.model.Job;
-import com.butenov.jobplatform.matching.dto.JobCandidateMatchDto;
+import com.butenov.jobplatform.matching.dto.CandidateMatchingDto;
+import com.butenov.jobplatform.matching.dto.JobMatchingDto;
 import com.butenov.jobplatform.matching.model.JobCandidateMatch;
 import com.butenov.jobplatform.matching.repository.JobCandidateMatchRepository;
 import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
-import com.butenov.jobplatform.matching.service.LlmIntellectualJobCandidateMatchService;
-import com.butenov.jobplatform.skills.model.Skill;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,42 +28,56 @@ import lombok.RequiredArgsConstructor;
 public class DefaultJobCandidateMatchService implements JobCandidateMatchService
 {
 	private final JobCandidateMatchRepository jobCandidateMatchRepository;
-	private final LlmIntellectualJobCandidateMatchService llmIntellectualJobCandidateMatchService;
+	private final MatchScoreCalculationAsyncExecutor matchScoreCalculationAsyncExecutor;
+	private final ObjectMapper objectMapper;
+	private final Map<String, CompletableFuture<JobCandidateMatch>> inFlight = new ConcurrentHashMap<>();
 
-	@Transactional
 	@Override
-	public JobCandidateMatch calculateAndStoreMatchScore(final Job job, final Candidate candidate)
-	{
-		final Optional<JobCandidateMatch> jobCandidateMatchOptional = jobCandidateMatchRepository.findByJobAndCandidate(job,
-				candidate);
-		if (jobCandidateMatchOptional.isPresent())
-		{
-			return jobCandidateMatchOptional.get();
-		}
-		final double skillMatch = calculateSkillMatch(job, candidate);
-		final JobCandidateMatchDto llmIntellectualMatch = llmIntellectualJobCandidateMatchService.calculateLlmIntellectualMatch(
-				job, candidate);
-		final double locationMatch = calculateLocationMatch(job, candidate);
-
-		final double matchScore = (skillMatch * 0.4) + (llmIntellectualMatch.getExperienceMatch() * 0.4) + (locationMatch * 0.2);
-
-		return jobCandidateMatchRepository.save(
-				new JobCandidateMatch(job, candidate, matchScore, llmIntellectualMatch.getJustification()));
-
-	}
-
 	@Transactional
-	@Override
 	public JobCandidateMatch getJobMatchScore(final Job job, final Candidate candidate)
 	{
-		return jobCandidateMatchRepository.findByJobAndCandidate(job, candidate)
-		                                  .orElse(calculateAndStoreMatchScore(job, candidate));
+		try
+		{
+			return getJobMatchScoreAsync(job, candidate).get();
+		}
+		catch (final InterruptedException | ExecutionException e)
+		{
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("Failed to calculate match score", e);
+		}
+	}
+
+	@Override
+	public List<JobCandidateMatch> getJobMatchScores(final List<Job> jobs, final Candidate candidate)
+	{
+		final List<CompletableFuture<JobCandidateMatch>> futures = jobs.stream()
+		                                                               .map(job -> getJobMatchScoreAsync(job, candidate))
+		                                                               .toList();
+
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+		return futures.stream()
+		              .map(future -> {
+			              try
+			              {
+				              return future.get();
+			              }
+			              catch (final Exception e)
+			              {
+				              Thread.currentThread().interrupt();
+				              throw new IllegalStateException("Failed to calculate match score", e);
+			              }
+		              })
+		              .filter(Objects::nonNull)
+		              .toList();
 	}
 
 	@Transactional
 	@Override
 	public void delete(final Job job)
 	{
+		final String prefix = job.getId() + "-";
+		inFlight.keySet().removeIf(k -> k.startsWith(prefix));
 		jobCandidateMatchRepository.deleteByJob(job);
 	}
 
@@ -65,34 +85,44 @@ public class DefaultJobCandidateMatchService implements JobCandidateMatchService
 	@Override
 	public void delete(final Candidate candidate)
 	{
+		final String suffix = "-" + candidate.getId();
+		inFlight.keySet().removeIf(k -> k.endsWith(suffix));
 		jobCandidateMatchRepository.deleteByCandidate(candidate);
 	}
 
-	private double calculateSkillMatch(final Job job, final Candidate candidate)
+	private CompletableFuture<JobCandidateMatch> getJobMatchScoreAsync(final Job job, final Candidate candidate)
 	{
-		final Set<Skill> jobSkills = job.getRequiredSkills();
-		final Set<Skill> candidateSkills = candidate.getCandidateProfile().getSkills();
-
-		if (jobSkills == null || jobSkills.isEmpty())
+		try
 		{
-			return 0.0;
-		}
+			final String key = job.getId() + "-" + candidate.getId();
+			final JobMatchingDto rawJobDto = JobMatchingDto.builder()
+			                                               .id(job.getId())
+			                                               .title(job.getTitle())
+			                                               .description(job.getDescription())
+			                                               .requirements(job.getRequirements())
+			                                               .requiredSkills(new ArrayList<>(job.getRequiredSkills()))
+			                                               .build();
+			final CandidateMatchingDto rawCandidateDto = new CandidateMatchingDto(
+					candidate.getId(), candidate.getCandidateProfile().getJobExperiences(),
+					new ArrayList<>(candidate.getCandidateProfile().getSkills()),
+					candidate.getCandidateProfile().getEducations());
+			final JobMatchingDto jobMatchingDto = objectMapper.readValue(objectMapper.writeValueAsString(rawJobDto),
+					JobMatchingDto.class);
+			jobMatchingDto.setId(job.getId());
+			final CandidateMatchingDto candidateMatchingDto = objectMapper.readValue(
+					objectMapper.writeValueAsString(rawCandidateDto), CandidateMatchingDto.class);
+			candidateMatchingDto.setId(candidate.getId());
 
-		if (candidateSkills == null || candidateSkills.isEmpty())
+			final Optional<JobCandidateMatch> stored = jobCandidateMatchRepository.findByJobAndCandidate(job, candidate);
+			return stored.map(CompletableFuture::completedFuture).orElseGet(() -> inFlight.computeIfAbsent(key, k ->
+					matchScoreCalculationAsyncExecutor.calculateAndStoreMatchScore(jobMatchingDto, candidateMatchingDto)
+					                                  .whenComplete((res, ex) -> inFlight.remove(k))
+			));
+		}
+		catch (final Exception e)
 		{
-			return 0.0;
+			throw new RuntimeException("Failed to convert job or candidate to JSON", e);
 		}
-
-		final long matchingSkills = candidateSkills.stream()
-		                                           .filter(jobSkills::contains)
-		                                           .count();
-
-		return (double) matchingSkills / jobSkills.size();
 	}
 
-	// TODO
-	private double calculateLocationMatch(final Job job, final Candidate candidate)
-	{
-		return 1.0;
-	}
 }
