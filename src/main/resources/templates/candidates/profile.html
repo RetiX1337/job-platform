@@ -72,9 +72,13 @@
 
     <div class="container mt-4">
         <div class="card mb-4">
-            <div class="card-header">
-                <h2 th:text="${candidate.firstName} + ' ' + ${candidate.lastName}">Candidate Name</h2>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0" th:text="${candidate.firstName} + ' ' + ${candidate.lastName}">Candidate Name</h2>
+                <a sec:authorize="@securityUtil.isCandidate()" th:href="@{/candidates/edit}" class="btn btn-outline-light btn-lg">
+                    Edit
+                </a>
             </div>
+
             <div class="card-body">
 
                 <div class="mb-4">

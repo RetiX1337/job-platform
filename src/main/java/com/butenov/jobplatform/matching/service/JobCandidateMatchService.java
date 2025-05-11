@@ -16,6 +16,9 @@ public interface JobCandidateMatchService
 	@Transactional
 	List<JobCandidateMatch> getJobMatchScores(List<Job> jobs, Candidate candidate);
 
+	@Transactional
+	List<JobCandidateMatch> getJobMatchScores(Job jobs, List<Candidate> candidate);
+
 	void delete(Job job);
 
 	void delete(Candidate candidate);

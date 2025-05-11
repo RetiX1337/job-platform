@@ -16,6 +16,7 @@ import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.candidates.repository.CandidateRepository;
 import com.butenov.jobplatform.candidates.repository.CandidateSpecifications;
 import com.butenov.jobplatform.candidates.service.CandidateSearchService;
+import com.butenov.jobplatform.jobs.dto.JobIntellectualSearchResult;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.skills.model.Skill;
@@ -45,19 +46,14 @@ public class DefaultCandidateSearchService implements CandidateSearchService
 
 		final List<Candidate> topCandidates = preRankCandidates(preFilteredCandidates.getContent(), job);
 
-		topCandidates.forEach(candidate -> jobCandidateMatchService.getJobMatchScore(job, candidate));
-
-		final List<CandidateIntellectualSearchResult> topCandidatesWithMatch = topCandidates.stream()
-		                                                                              .map(candidate -> new CandidateIntellectualSearchResult(
-				                                                                              candidate,
-				                                                                              jobCandidateMatchService.getJobMatchScore(
-						                                                                              job,
-						                                                                              candidate)))
-		                                                                              .sorted(Comparator.<CandidateIntellectualSearchResult>comparingDouble(
-				                                                                                                candidate -> candidate.getJobCandidateMatch()
-				                                                                                                                      .getMatchScore())
-		                                                                                                .reversed())
-		                                                                              .toList();
+		final List<CandidateIntellectualSearchResult> topCandidatesWithMatch = jobCandidateMatchService.getJobMatchScores(job,
+				                                                                                               topCandidates).stream()
+		                                                                                               .map(CandidateIntellectualSearchResult::new)
+		                                                                                               .sorted(Comparator.<CandidateIntellectualSearchResult>comparingDouble(
+				                                                                                                                 candidate -> candidate.getJobCandidateMatch()
+				                                                                                                                                       .getMatchScore())
+		                                                                                                                 .reversed())
+		                                                                                               .toList();
 
 		return new PageImpl<>(topCandidatesWithMatch, pageable, preFilteredCandidates.getTotalElements());
 	}

@@ -50,26 +50,21 @@ public class DefaultJobCandidateMatchService implements JobCandidateMatchService
 	@Override
 	public List<JobCandidateMatch> getJobMatchScores(final List<Job> jobs, final Candidate candidate)
 	{
-		final List<CompletableFuture<JobCandidateMatch>> futures = jobs.stream()
-		                                                               .map(job -> getJobMatchScoreAsync(job, candidate))
-		                                                               .toList();
+		return resolveFutures(
+				jobs.stream()
+				    .map(job -> getJobMatchScoreAsync(job, candidate))
+				    .toList()
+		);
+	}
 
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-		return futures.stream()
-		              .map(future -> {
-			              try
-			              {
-				              return future.get();
-			              }
-			              catch (final Exception e)
-			              {
-				              Thread.currentThread().interrupt();
-				              throw new IllegalStateException("Failed to calculate match score", e);
-			              }
-		              })
-		              .filter(Objects::nonNull)
-		              .toList();
+	@Override
+	public List<JobCandidateMatch> getJobMatchScores(final Job job, final List<Candidate> candidates)
+	{
+		return resolveFutures(
+				candidates.stream()
+				          .map(candidate -> getJobMatchScoreAsync(job, candidate))
+				          .toList()
+		);
 	}
 
 	@Transactional
@@ -124,5 +119,26 @@ public class DefaultJobCandidateMatchService implements JobCandidateMatchService
 			throw new RuntimeException("Failed to convert job or candidate to JSON", e);
 		}
 	}
+
+	private List<JobCandidateMatch> resolveFutures(final List<CompletableFuture<JobCandidateMatch>> futures)
+	{
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+		return futures.stream()
+		              .map(future -> {
+			              try
+			              {
+				              return future.get();
+			              }
+			              catch (final Exception e)
+			              {
+				              Thread.currentThread().interrupt();
+				              throw new IllegalStateException("Failed to calculate match score", e);
+			              }
+		              })
+		              .filter(Objects::nonNull)
+		              .toList();
+	}
+
 
 }

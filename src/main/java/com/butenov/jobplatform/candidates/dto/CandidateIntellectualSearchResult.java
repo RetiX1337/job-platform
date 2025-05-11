@@ -16,4 +16,10 @@ public class CandidateIntellectualSearchResult
 {
 	private Candidate candidate;
 	private JobCandidateMatch jobCandidateMatch;
+
+	public CandidateIntellectualSearchResult(final JobCandidateMatch jobCandidateMatch)
+	{
+		this.candidate = jobCandidateMatch.getCandidate();
+		this.jobCandidateMatch = jobCandidateMatch;
+	}
 }

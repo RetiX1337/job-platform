@@ -42,7 +42,6 @@ public class MatchScoreCalculationAsyncExecutor
 	{
 		try
 		{
-			System.out.println("Async task is running on thread: " + Thread.currentThread().getName());
 			final Job job = jobRepository.findById(jobMatchingDto.getId())
 			                             .orElseThrow(() -> new IllegalArgumentException("Job not found"));
 			final Candidate candidate = candidateRepository.findById(candidateMatchingDto.getId())
@@ -51,8 +50,6 @@ public class MatchScoreCalculationAsyncExecutor
 			final String jobJson = objectMapper.writeValueAsString(jobMatchingDto);
 			final String candidateJson = objectMapper.writeValueAsString(candidateMatchingDto);
 
-			System.out.println(jobJson);
-			System.out.println(candidateJson);
 			// (re-check cache inside transaction to avoid races)
 			return CompletableFuture.supplyAsync(() -> jobCandidateMatchRepository.findByJobAndCandidate(job, candidate)
 			                                                                      .orElseGet(() -> {
