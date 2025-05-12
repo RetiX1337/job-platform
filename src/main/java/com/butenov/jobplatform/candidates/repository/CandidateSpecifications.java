@@ -29,12 +29,6 @@ public class CandidateSpecifications
 				spec = spec.and((r, q, c) -> skillsJoin.get("id").in(criteria.getSkillIds()));
 			}
 
-			//if (criteria.getLocation() != null && !criteria.getLocation().isBlank())
-			//{
-			//	spec = spec.and((r, q, c) ->
-			//			c.like(c.lower(r.get("location")), "%" + criteria.getLocation().toLowerCase() + "%"));
-			//}
-
 			return spec.toPredicate(root, query, cb);
 		};
 	}

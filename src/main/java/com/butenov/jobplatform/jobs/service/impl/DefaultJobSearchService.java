@@ -2,6 +2,7 @@ package com.butenov.jobplatform.jobs.service.impl;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -17,7 +18,6 @@ import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.jobs.repository.JobRepository;
 import com.butenov.jobplatform.jobs.repository.JobSpecifications;
 import com.butenov.jobplatform.jobs.service.JobSearchService;
-import com.butenov.jobplatform.matching.model.JobCandidateMatch;
 import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.skills.model.Skill;
 
@@ -48,21 +48,20 @@ public class DefaultJobSearchService implements JobSearchService
 	public Page<JobIntellectualSearchResult> findMostFittingJobs(final JobSearchCriteria criteria, final Candidate candidate,
 	                                                             final Pageable pageable)
 	{
-		final Specification<Job> sortByMatchingSkills = JobSpecifications.sortByMatchingSkills(candidate.getCandidateProfile().getSkills().stream()
-		                                                                                                .map(Skill::getId)
-		                                                                                                .collect(Collectors.toSet()));
-		final Specification<Job> spec = JobSpecifications.withFilters(
+		final Set<Long> skillIds = candidate.getCandidateProfile().getSkills().stream()
+		                                    .map(Skill::getId).collect(Collectors.toSet());
+
+		final Page<Job> page = jobRepository.findBySkillsAndFiltersOrdered(
+				skillIds,
 				criteria.getTitle(),
 				criteria.getLocation(),
 				criteria.getMinSalary(),
 				criteria.getMaxSalary(),
-				criteria.getRequiredSkillIds(),
-				criteria.getCompanyIds()
-		).and(sortByMatchingSkills);
+				criteria.getCompanyIds(),
+				pageable
+		);
 
-		final Page<Job> preFilteredJobs = jobRepository.findAll(spec, pageable);
-
-		final List<Job> topJobs = preRankJobs(preFilteredJobs.getContent(), candidate);
+		final List<Job> topJobs = preRankJobs(page.getContent(), candidate);
 
 		final List<JobIntellectualSearchResult> topJobsWithMatch = jobCandidateMatchService.getJobMatchScores(topJobs, candidate).stream()
 		                                                                                .map(JobIntellectualSearchResult::new)
@@ -71,7 +70,7 @@ public class DefaultJobSearchService implements JobSearchService
 				                                                                                          .getMatchScore()).reversed())
 		                                                                                .toList();
 
-		return new PageImpl<>(topJobsWithMatch, pageable, preFilteredJobs.getTotalElements());
+		return new PageImpl<>(topJobsWithMatch, pageable, page.getTotalElements());
 	}
 
 	private List<Job> preRankJobs(final List<Job> jobs, final Candidate candidate)

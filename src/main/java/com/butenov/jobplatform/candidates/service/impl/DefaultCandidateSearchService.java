@@ -2,21 +2,19 @@ package com.butenov.jobplatform.candidates.service.impl;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.butenov.jobplatform.candidates.dto.CandidateIntellectualSearchResult;
 import com.butenov.jobplatform.candidates.dto.CandidateSearchCriteria;
 import com.butenov.jobplatform.candidates.model.Candidate;
 import com.butenov.jobplatform.candidates.repository.CandidateRepository;
-import com.butenov.jobplatform.candidates.repository.CandidateSpecifications;
 import com.butenov.jobplatform.candidates.service.CandidateSearchService;
-import com.butenov.jobplatform.jobs.dto.JobIntellectualSearchResult;
 import com.butenov.jobplatform.jobs.model.Job;
 import com.butenov.jobplatform.matching.service.JobCandidateMatchService;
 import com.butenov.jobplatform.skills.model.Skill;
@@ -35,14 +33,11 @@ public class DefaultCandidateSearchService implements CandidateSearchService
 	                                                                         final Job job,
 	                                                                         final Pageable pageable)
 	{
-		final Specification<Candidate> sortByMatchingSkills = CandidateSpecifications.sortByMatchingSkills(
-				job.getRequiredSkills().stream()
-				   .map(Skill::getId)
-				   .collect(Collectors.toSet()));
+		final Set<Long> skillIds = job.getRequiredSkills().stream()
+		                              .map(Skill::getId).collect(Collectors.toSet());
 
-		final Specification<Candidate> spec = CandidateSpecifications.withFilters(criteria).and(sortByMatchingSkills);
 
-		final Page<Candidate> preFilteredCandidates = candidateRepository.findAll(spec, pageable);
+		final Page<Candidate> preFilteredCandidates = candidateRepository.findByMatchingSkills(skillIds, pageable);
 
 		final List<Candidate> topCandidates = preRankCandidates(preFilteredCandidates.getContent(), job);
 

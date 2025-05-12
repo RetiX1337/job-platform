@@ -2,7 +2,6 @@ package com.butenov.jobplatform.matching.service.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.scheduling.annotation.Async;
@@ -19,7 +18,6 @@ import com.butenov.jobplatform.matching.model.JobCandidateMatch;
 import com.butenov.jobplatform.matching.repository.JobCandidateMatchRepository;
 import com.butenov.jobplatform.matching.service.LlmIntellectualJobCandidateMatchService;
 import com.butenov.jobplatform.skills.model.Skill;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
@@ -57,12 +55,9 @@ public class MatchScoreCalculationAsyncExecutor
 						                                                                      jobMatchingDto, candidateMatchingDto);
 				                                                                      final JobCandidateMatchDto intellectual = llmIntellectualJobCandidateMatchService.calculateLlmIntellectualMatch(
 						                                                                      jobJson, candidateJson);
-				                                                                      final double locationMatch = calculateLocationMatch(
-						                                                                      job, candidate);
 
 				                                                                      final double score = skillMatch * 0.4
-						                                                                      + intellectual.getExperienceMatch() * 0.4
-						                                                                      + locationMatch * 0.2;
+						                                                                      + intellectual.getExperienceMatch() * 0.6;
 
 				                                                                      final JobCandidateMatch entity = new JobCandidateMatch(
 						                                                                      job, candidate, score,
@@ -97,11 +92,5 @@ public class MatchScoreCalculationAsyncExecutor
 		                                           .count();
 
 		return (double) matchingSkills / jobSkills.size();
-	}
-
-	// TODO
-	private double calculateLocationMatch(final Job job, final Candidate candidate)
-	{
-		return 1.0;
 	}
 }
